@@ -1,0 +1,18 @@
+service: email-forwarder-api
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: us-east-1
+
+plugins:
+  - serverless-plugin-typescript
+
+functions:
+  graphql:
+    handler: handler.graphql
+    events:
+      - http:
+          path: graphql
+          method: post
+          cors: true
