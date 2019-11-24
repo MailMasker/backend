@@ -3,8 +3,9 @@ import * as aws from "aws-sdk";
 
 import { ApolloServer, gql } from "apollo-server-lambda";
 
-import { Context } from "./dal/ctx";
-import { getUserFromToken } from "./dal/getUserFromToken";
+import { Context } from "./src/dal/ctx";
+import { Me } from "./src/api/types";
+import { getUserFromToken } from "./src/dal/getUserFromToken";
 
 aws.config.update({ region: "us-east-1" });
 
@@ -14,13 +15,6 @@ const ctx: Context = {
   ddb
 };
 
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
 // Provide resolver functions for your schema fields
 const resolvers = {
   Query: {
@@ -29,7 +23,7 @@ const resolvers = {
 };
 
 const server = new ApolloServer({
-  typeDefs,
+  typeDefs: "./src/api/schema.graphql",
   resolvers,
   context: ({ req }) => {
     // get the user token from the headers
