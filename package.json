@@ -1,17 +1,20 @@
 {
   "scripts": {
-    "codegen": "graphql-codegen --config ./schema.yml"
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
-    "apollo-server-lambda": "^2.9.9",
-    "graphql-tools": "^4.0.6"
+    "apollo": "^2.21.1",
+    "apollo-server-lambda": "^2.9.9"
   },
   "devDependencies": {
-    "@graphql-codegen/typescript-resolvers": "^1.8.3",
+    "@graphql-codegen/cli": "^1.8.3",
+    "@graphql-codegen/typescript-resolvers": "1.8.3",
     "aws-sdk": "^2.573.0",
-    "graphql-codegen": "^0.4.0",
+    "graphql": "^14.5.8",
     "prettier": "^1.19.1",
     "serverless-plugin-typescript": "^1.1.9",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "@graphql-codegen/typescript": "1.8.3",
+    "@graphql-codegen/introspection": "1.8.3"
   }
 }

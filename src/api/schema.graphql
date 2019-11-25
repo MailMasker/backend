@@ -1,5 +1,5 @@
 type Query {
     me: {
       userID: string;
-    },
+    }
 }

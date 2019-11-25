@@ -4,7 +4,7 @@ import * as aws from "aws-sdk";
 import { ApolloServer, gql } from "apollo-server-lambda";
 
 import { Context } from "./src/dal/ctx";
-import { Me } from "./src/api/types";
+import { QueryResolvers } from "./src/api/types.generated";
 import { getUserFromToken } from "./src/dal/getUserFromToken";
 
 aws.config.update({ region: "us-east-1" });
@@ -15,10 +15,9 @@ const ctx: Context = {
   ddb
 };
 
-// Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => "Hello world!"
+const resolvers: QueryResolvers = {
+  hello: (root, args, context) => {
+    return "hi!";
   }
 };
 
