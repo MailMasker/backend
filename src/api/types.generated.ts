@@ -9,15 +9,14 @@ export type Scalars = {
   Float: number,
 };
 
-
-export enum CacheControlScope {
-  Public = 'PUBLIC',
-  Private = 'PRIVATE'
-}
+export type Me = {
+   __typename?: 'Me',
+  userID: Scalars['String'],
+};
 
 export type Query = {
    __typename?: 'Query',
-  hello?: Maybe<Scalars['String']>,
+  me: Me,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -93,29 +92,29 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>,
+  Me: ResolverTypeWrapper<Me>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
-  CacheControlScope: CacheControlScope,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Query: {},
+  Me: Me,
   String: Scalars['String'],
   Boolean: Scalars['Boolean'],
-  CacheControlScope: CacheControlScope,
-  Int: Scalars['Int'],
 }>;
 
-export type CacheControlDirectiveResolver<Result, Parent, ContextType = any, Args = {   maxAge?: Maybe<Maybe<Scalars['Int']>>,
-  scope?: Maybe<Maybe<CacheControlScope>> }> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+export type MeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me']> = ResolversObject<{
+  userID?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  hello?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  Me?: MeResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
 }>;
 
@@ -125,13 +124,3 @@ export type Resolvers<ContextType = any> = ResolversObject<{
  * Use "Resolvers" root object instead. If you wish to get "IResolvers", add "typesPrefix: I" to your config.
 */
 export type IResolvers<ContextType = any> = Resolvers<ContextType>;
-export type DirectiveResolvers<ContextType = any> = ResolversObject<{
-  cacheControl?: CacheControlDirectiveResolver<any, any, ContextType>,
-}>;
-
-
-/**
-* @deprecated
-* Use "DirectiveResolvers" root object instead. If you wish to get "IDirectiveResolvers", add "typesPrefix: I" to your config.
-*/
-export type IDirectiveResolvers<ContextType = any> = DirectiveResolvers<ContextType>;
