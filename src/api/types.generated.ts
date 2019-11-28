@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
 export type Maybe<T> = T | null;
+export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string,
@@ -9,9 +10,27 @@ export type Scalars = {
   Float: number,
 };
 
+export type CreateAccountPayload = {
+   __typename?: 'CreateAccountPayload',
+  success: Scalars['Boolean'],
+  userID?: Maybe<Scalars['String']>,
+  errorMessage?: Maybe<Scalars['String']>,
+};
+
 export type Me = {
    __typename?: 'Me',
   userID: Scalars['String'],
+};
+
+export type Mutation = {
+   __typename?: 'Mutation',
+  createAccount: CreateAccountPayload,
+};
+
+
+export type MutationCreateAccountArgs = {
+  uuid: Scalars['String'],
+  username: Scalars['String']
 };
 
 export type Query = {
@@ -94,6 +113,8 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>,
   Me: ResolverTypeWrapper<Me>,
   String: ResolverTypeWrapper<Scalars['String']>,
+  Mutation: ResolverTypeWrapper<{}>,
+  CreateAccountPayload: ResolverTypeWrapper<CreateAccountPayload>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 }>;
 
@@ -102,11 +123,23 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {},
   Me: Me,
   String: Scalars['String'],
+  Mutation: {},
+  CreateAccountPayload: CreateAccountPayload,
   Boolean: Scalars['Boolean'],
+}>;
+
+export type CreateAccountPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateAccountPayload'] = ResolversParentTypes['CreateAccountPayload']> = ResolversObject<{
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
+  userID?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
 export type MeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me']> = ResolversObject<{
   userID?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createAccount?: Resolver<ResolversTypes['CreateAccountPayload'], ParentType, ContextType, RequireFields<MutationCreateAccountArgs, 'uuid' | 'username'>>,
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
@@ -114,7 +147,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  CreateAccountPayload?: CreateAccountPayloadResolvers<ContextType>,
   Me?: MeResolvers<ContextType>,
+  Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
 }>;
 

@@ -1,7 +1,17 @@
+type CreateAccountPayload {
+  success: Boolean!
+  userID: String
+  errorMessage: String
+}
+
 type Me {
   userID: String!
 }
 
 type Query {
   me: Me!
+}
+
+type Mutation {
+  createAccount(uuid: String!, username: String!): CreateAccountPayload!
 }

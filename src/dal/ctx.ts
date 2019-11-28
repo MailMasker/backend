@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as aws from "aws-sdk";
 
-export type Context = {
+export type Ctx = {
   ddb: aws.DynamoDB;
 };
