@@ -7,12 +7,23 @@ provider:
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-offline
+
+package:
+  include:
+    - src/api/schema.graphql
 
 functions:
   graphql:
-    handler: handler.graphql
+    handler: index.handler
     events:
       - http:
           path: graphql
           method: post
-          # cors: true
+          cors: true
+  playground:
+    handler: index.handler
+    events:
+      - http:
+          path: playground
+          method: get

@@ -1,10 +1,15 @@
 // @ts-ignore
 import * as aws from "aws-sdk";
+import * as fs from "fs";
+import * as path from "path";
 
-import { ApolloServer, gql } from "apollo-server-lambda";
+import { ApolloServer, gql } from "apollo-server-express";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import { Ctx } from "./src/dal/ctx";
+import express from "express";
+import graphiql from "graphql-playground-middleware-express";
+import serverless from "serverless-http";
 import { userIDForToken } from "./src/dal/userIDForToken";
 
 aws.config.update({ region: "us-east-1" });
@@ -35,11 +40,16 @@ const mutationResolvers: MutationResolvers = {
   }
 };
 
+const schema = fs.readFileSync(
+  path.join(__dirname, "./src/api/schema.graphql"),
+  "utf8"
+);
+
 const server = new ApolloServer({
-  typeDefs: "./src/api/schema.graphql",
+  typeDefs: schema,
   resolvers: {
-    ...queryResolvers,
-    ...mutationResolvers
+    Query: { ...queryResolvers },
+    Mutation: { ...mutationResolvers }
   },
   introspection: false,
   context: ({ req }) => {
@@ -54,9 +64,12 @@ const server = new ApolloServer({
   }
 });
 
-module.exports.graphql = server.createHandler({
-  cors: {
-    origin: true,
-    credentials: true
-  }
-});
+const app = express();
+
+server.applyMiddleware({ app });
+
+app.get("/playground", graphiql({ endpoint: "/graphql" }));
+
+const handler = serverless(app);
+
+export { handler };

@@ -11,10 +11,15 @@
     "@graphql-codegen/introspection": "1.8.3",
     "@graphql-codegen/typescript": "1.8.3",
     "@graphql-codegen/typescript-resolvers": "1.8.3",
+    "apollo-server-express": "^2.9.12",
     "aws-sdk": "^2.573.0",
+    "express": "^4.17.1",
     "graphql": "^14.5.8",
+    "graphql-playground-middleware-express": "^1.7.12",
     "prettier": "^1.19.1",
     "serverless": "^1.58.0",
+    "serverless-http": "^2.3.0",
+    "serverless-offline": "^5.12.1",
     "serverless-plugin-typescript": "^1.1.9",
     "typescript": "^3.7.2"
   }
