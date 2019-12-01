@@ -8,6 +8,14 @@ provider:
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
+  - serverless-dynamodb-local
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      migrate: true
 
 package:
   include:
@@ -27,3 +35,45 @@ functions:
       - http:
           path: playground
           method: get
+
+resources:
+  Resources:
+    auth:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: auth
+        AttributeDefinitions:
+          - AttributeName: Token
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Token
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    user:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: user
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+    route:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: route
+        AttributeDefinitions:
+          - AttributeName: To
+            AttributeType: S
+        KeySchema:
+          - AttributeName: To
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5

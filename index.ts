@@ -7,36 +7,67 @@ import { ApolloServer, gql } from "apollo-server-express";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import { Ctx } from "./src/dal/ctx";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import { createUser } from "./src/dal/createUser";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
 import serverless from "serverless-http";
 import { userIDForToken } from "./src/dal/userIDForToken";
 
-aws.config.update({ region: "us-east-1" });
+// @ts-ignore
+const { raw: ddb } = require("serverless-dynamodb-client");
 
-const ddb = new aws.DynamoDB({ apiVersion: "2012-08-10" });
+// console.log("ddb at init: ", ddb);
+
+aws.config.update({ region: "us-east-1" });
 
 const ctx: Ctx = {
   ddb
 };
 
-const queryResolvers: QueryResolvers = {
-  me: (parent, args, context, info) => {
-    console.log("parent", JSON.stringify(parent));
-    console.log("args", JSON.stringify(args));
-    console.log("context", JSON.stringify(context));
-    console.log("info", JSON.stringify(info));
-    return { userID: "123" };
+export const authenticated = next => (root, args, context, info) => {
+  if (!context.currentUserID) {
+    throw new Error(`Unauthenticated!`);
   }
+
+  return next(root, args, context, info);
+};
+
+const queryResolvers: QueryResolvers = {
+  ping: (parent, args, context, info) => {
+    // console.log("parent", JSON.stringify(parent));
+    // console.log("args", JSON.stringify(args));
+    // console.log("context", JSON.stringify(context));
+    // console.log("info", JSON.stringify(info));
+    return "pong";
+  },
+  me: authenticated((parent, args, context, info) => {
+    // console.log("parent", JSON.stringify(parent));
+    // console.log("args", JSON.stringify(args));
+    // console.log("context", JSON.stringify(context));
+    // console.log("info", JSON.stringify(info));
+    return { userID: "123" };
+  })
 };
 
 const mutationResolvers: MutationResolvers = {
-  createAccount: (parent, args, context, info) => {
-    console.log("parent", JSON.stringify(parent));
-    console.log("args", JSON.stringify(args));
-    console.log("context", JSON.stringify(context));
-    console.log("info", JSON.stringify(info));
-    return { userID: "123", success: true };
+  createUser: async (parent, args, context, info) => {
+    // console.log("parent", JSON.stringify(parent));
+    // console.log("args", JSON.stringify(args));
+    // console.log("context", JSON.stringify(context));
+    // console.log("info", JSON.stringify(info));
+
+    const {
+      user: { id },
+      authToken
+    } = await createUser(ctx, {
+      username: args.input.username,
+      email: args.input.email,
+      requestUUID: args.input.uuid
+    });
+
+    return { userID: id, token: authToken, success: true };
   }
 };
 
@@ -51,20 +82,38 @@ const server = new ApolloServer({
     Query: { ...queryResolvers },
     Mutation: { ...mutationResolvers }
   },
-  introspection: false,
-  context: ({ req }) => {
-    // get the user token from the headers
-    const token = req.headers.authorization || "";
+  introspection: true,
+  context: async ({ req, res }) => {
+    // console.log("req during context: ", req);
 
-    // try to retrieve a user with the token
-    const userID = userIDForToken(ctx, token);
+    if (req.cookies.authorization) {
+      console.log("cookie: ", req.cookies.authorization);
+    }
 
-    // add the user to the context
-    return { userID };
+    const token = req.cookies.authorization || req.headers.authorization;
+
+    let userID: string | null = null;
+    if (token) {
+      try {
+        userID = await userIDForToken(ctx, token);
+      } catch (error) {
+        console.warn("Error getting userID: ", error);
+      }
+    }
+
+    return { currentUserID: userID };
   }
 });
 
 const app = express();
+
+app.use(cookieParser());
+
+var corsOptions = {
+  origin: true,
+  credentials: true
+};
+app.use(cors(corsOptions));
 
 server.applyMiddleware({ app });
 

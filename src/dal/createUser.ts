@@ -1,52 +1,63 @@
-// @ts-ignore
-import * as aws from "aws-sdk";
-
-import { AuthSchema } from "./ddbTableSchemas";
-import { Context } from "./ctx";
+import { Ctx } from "./ctx";
+import { createAuthToken } from "./createAuthToken";
+import { v4 as uuid } from "uuid";
 
 export enum CreateUserError {
   UsernameAlreadyExists,
   UnknownError
 }
 
-export type CreateUserResponse = {
-  userID: string;
-  username: string;
-  authToken: string;
-};
-
 export function createUser(
-  { ddb }: Context,
+  ctx: Ctx,
   userData: {
     username: string;
-    userID: number;
+    email: string;
     requestUUID: string;
-    password: string;
   }
 ) {
-  const forwardRoutesParams = {
-    TableName: "users",
+  const userID: string = uuid();
+
+  const params = {
+    TableName: "user",
     Item: {
-      toEmail: { S: "jonsibley+test1@1nt.email" },
-      toEmailBase: { S: "jonsibley@1nt.email" },
-      forwardToEmails: { L: [{ S: "jonsibley+test1@gmail.com" }] }
+      ID: { S: "1234123879172938" },
+      Username: { S: "whatever" },
+      Email: { S: "jonsibley@gmail.com" }
     }
   };
 
   // TODO: create auth token and return a CreateUserResponse object
 
-  return new Promise<AuthSchema>((resolve, reject) => {
-    ddb.putItem(forwardRoutesParams, function(err, data) {
+  return new Promise<{
+    user: {
+      id: string;
+      username: string;
+      email: string;
+    };
+    authToken: string;
+  }>((resolve, reject) => {
+    ctx.ddb.putItem(params, function(err, data) {
       if (err) {
-        console.error(
-          new Error(`Error creating user ${userData.userID}: ${err}`)
-        );
+        console.error(new Error(`Error creating user ${userID}: ${err}`));
         reject(err);
       } else {
-        console.info(`Successfully got auth for user ${data.username}`);
+        console.info(`Successfully created user with userID ${userID}`);
         // TODO: print everything in debug mode! And turn off debug mode in production
         // console.debug(`Successfully got auth for user ${data.username}`);
-        resolve(data);
+
+        createAuthToken(ctx, userID).then(({ authToken }) => {
+          console.info(
+            `Successfully created the first auth token for userID ${userID}`
+          );
+          resolve({
+            user: {
+              id: userID,
+              username: userData.username,
+              email: userData.email
+            },
+            authToken
+          });
+        });
       }
     });
   });

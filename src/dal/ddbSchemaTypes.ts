@@ -7,6 +7,7 @@ export type Auth = {
 export type User = {
   userID: string;
   username: string;
+  email: string;
   created: number;
   modified: number;
 };

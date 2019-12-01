@@ -1,17 +1,27 @@
-type CreateAccountPayload {
+input CreateUserInput {
+  uuid: String!
+  username: String!
+  email: String!
+}
+
+type CreateUserPayload {
   success: Boolean!
   userID: String
+  token: String
   errorMessage: String
 }
 
-type Me {
-  userID: String!
+type User {
+  id: String!
+  username: String!
+  email: String!
 }
 
 type Query {
-  me: Me!
+  me: User!
+  ping: String!
 }
 
 type Mutation {
-  createAccount(uuid: String!, username: String!): CreateAccountPayload!
+  createUser(input: CreateUserInput!): CreateUserPayload!
 }

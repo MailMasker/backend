@@ -1,8 +1,3 @@
-// @ts-ignore
-import * as aws from "aws-sdk";
-
-import { Auth, User } from "./ddbSchemaTypes";
-
 import { Ctx } from "./ctx";
 
 export function userIDForToken({ ddb }: Ctx, token: string): Promise<string> {
@@ -17,6 +12,8 @@ export function userIDForToken({ ddb }: Ctx, token: string): Promise<string> {
   };
 
   return new Promise<string>((resolve, reject) => {
+    console.log("ddb", ddb);
+
     ddb.getItem(
       statsParams,
       (err, data: { Item: { UserID: { S: string } } }) => {

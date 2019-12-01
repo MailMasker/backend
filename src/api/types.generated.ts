@@ -10,32 +10,41 @@ export type Scalars = {
   Float: number,
 };
 
-export type CreateAccountPayload = {
-   __typename?: 'CreateAccountPayload',
-  success: Scalars['Boolean'],
-  userID?: Maybe<Scalars['String']>,
-  errorMessage?: Maybe<Scalars['String']>,
+export type CreateUserInput = {
+  uuid: Scalars['String'],
+  username: Scalars['String'],
+  email: Scalars['String'],
 };
 
-export type Me = {
-   __typename?: 'Me',
-  userID: Scalars['String'],
+export type CreateUserPayload = {
+   __typename?: 'CreateUserPayload',
+  success: Scalars['Boolean'],
+  userID?: Maybe<Scalars['String']>,
+  token?: Maybe<Scalars['String']>,
+  errorMessage?: Maybe<Scalars['String']>,
 };
 
 export type Mutation = {
    __typename?: 'Mutation',
-  createAccount: CreateAccountPayload,
+  createUser: CreateUserPayload,
 };
 
 
-export type MutationCreateAccountArgs = {
-  uuid: Scalars['String'],
-  username: Scalars['String']
+export type MutationCreateUserArgs = {
+  input: CreateUserInput
 };
 
 export type Query = {
    __typename?: 'Query',
-  me: Me,
+  me: User,
+  ping: Scalars['String'],
+};
+
+export type User = {
+   __typename?: 'User',
+  id: Scalars['String'],
+  username: Scalars['String'],
+  email: Scalars['String'],
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -111,46 +120,52 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>,
-  Me: ResolverTypeWrapper<Me>,
+  User: ResolverTypeWrapper<User>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Mutation: ResolverTypeWrapper<{}>,
-  CreateAccountPayload: ResolverTypeWrapper<CreateAccountPayload>,
+  CreateUserInput: CreateUserInput,
+  CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Query: {},
-  Me: Me,
+  User: User,
   String: Scalars['String'],
   Mutation: {},
-  CreateAccountPayload: CreateAccountPayload,
+  CreateUserInput: CreateUserInput,
+  CreateUserPayload: CreateUserPayload,
   Boolean: Scalars['Boolean'],
 }>;
 
-export type CreateAccountPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateAccountPayload'] = ResolversParentTypes['CreateAccountPayload']> = ResolversObject<{
+export type CreateUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateUserPayload'] = ResolversParentTypes['CreateUserPayload']> = ResolversObject<{
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   userID?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
-export type MeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me']> = ResolversObject<{
-  userID?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-}>;
-
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createAccount?: Resolver<ResolversTypes['CreateAccountPayload'], ParentType, ContextType, RequireFields<MutationCreateAccountArgs, 'uuid' | 'username'>>,
+  createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>,
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
+  me?: Resolver<ResolversTypes['User'], ParentType, ContextType>,
+  ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
+export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  username?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
-  CreateAccountPayload?: CreateAccountPayloadResolvers<ContextType>,
-  Me?: MeResolvers<ContextType>,
+  CreateUserPayload?: CreateUserPayloadResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
+  User?: UserResolvers<ContextType>,
 }>;
 
 
