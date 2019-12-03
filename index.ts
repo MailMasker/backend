@@ -4,71 +4,40 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { ApolloServer, gql } from "apollo-server-express";
+import {
+  AuthenticatedResolverContext,
+  ResolverContext
+} from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
-import { Ctx } from "./src/dal/ctx";
+import { DALContext } from "./src/dal/DALContext";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { createUser } from "./src/dal/createUser";
+import { createUser } from "./src/api/mutations/createUser";
+import { raw as ddb } from "serverless-dynamodb-client";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
+import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
 import { userIDForToken } from "./src/dal/userIDForToken";
 
-// @ts-ignore
-const { raw: ddb } = require("serverless-dynamodb-client");
-
-// console.log("ddb at init: ", ddb);
+const OneYear = 60 * 60 * 24 * 365;
 
 aws.config.update({ region: "us-east-1" });
 
-const ctx: Ctx = {
-  ddb
-};
-
-export const authenticated = next => (root, args, context, info) => {
-  if (!context.currentUserID) {
-    throw new Error(`Unauthenticated!`);
-  }
-
-  return next(root, args, context, info);
+const dalContext: DALContext = {
+  ddb: ddb
 };
 
 const queryResolvers: QueryResolvers = {
   ping: (parent, args, context, info) => {
-    // console.log("parent", JSON.stringify(parent));
-    // console.log("args", JSON.stringify(args));
-    // console.log("context", JSON.stringify(context));
-    // console.log("info", JSON.stringify(info));
     return "pong";
   },
-  me: authenticated((parent, args, context, info) => {
-    // console.log("parent", JSON.stringify(parent));
-    // console.log("args", JSON.stringify(args));
-    // console.log("context", JSON.stringify(context));
-    // console.log("info", JSON.stringify(info));
-    return { userID: "123" };
-  })
+  me
 };
 
 const mutationResolvers: MutationResolvers = {
-  createUser: async (parent, args, context, info) => {
-    // console.log("parent", JSON.stringify(parent));
-    // console.log("args", JSON.stringify(args));
-    // console.log("context", JSON.stringify(context));
-    // console.log("info", JSON.stringify(info));
-
-    const {
-      user: { id },
-      authToken
-    } = await createUser(ctx, {
-      username: args.input.username,
-      email: args.input.email,
-      requestUUID: args.input.uuid
-    });
-
-    return { userID: id, token: authToken, success: true };
-  }
+  createUser
 };
 
 const schema = fs.readFileSync(
@@ -84,24 +53,29 @@ const server = new ApolloServer({
   },
   introspection: true,
   context: async ({ req, res }) => {
-    // console.log("req during context: ", req);
+    const token = req.cookies.Authorization || req.headers.Authorization;
 
-    if (req.cookies.authorization) {
-      console.log("cookie: ", req.cookies.authorization);
-    }
-
-    const token = req.cookies.authorization || req.headers.authorization;
-
-    let userID: string | null = null;
+    let userID: string | undefined;
     if (token) {
       try {
-        userID = await userIDForToken(ctx, token);
+        userID = await userIDForToken(dalContext, token);
       } catch (error) {
         console.warn("Error getting userID: ", error);
       }
     }
 
-    return { currentUserID: userID };
+    const context: ResolverContext | AuthenticatedResolverContext = {
+      currentUserID: userID,
+      dalContext,
+      setAuthCookie: (token: string) => {
+        // TODO: make max-age shorter if marked as a public computer
+        res.setHeader(
+          "Set-Cookie",
+          `Authorization=${token}; Max-Age=${OneYear}`
+        );
+      }
+    };
+    return context;
   }
 });
 

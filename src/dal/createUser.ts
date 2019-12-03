@@ -1,4 +1,4 @@
-import { Ctx } from "./ctx";
+import { DALContext } from "./DALContext";
 import { createAuthToken } from "./createAuthToken";
 import { v4 as uuid } from "uuid";
 
@@ -8,7 +8,7 @@ export enum CreateUserError {
 }
 
 export function createUser(
-  ctx: Ctx,
+  ctx: DALContext,
   userData: {
     username: string;
     email: string;
@@ -20,9 +20,9 @@ export function createUser(
   const params = {
     TableName: "user",
     Item: {
-      ID: { S: "1234123879172938" },
-      Username: { S: "whatever" },
-      Email: { S: "jonsibley@gmail.com" }
+      ID: { S: userID },
+      Username: { S: userData.username },
+      Email: { S: userData.email }
     }
   };
 

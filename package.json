@@ -2,7 +2,8 @@
   "scripts": {
     "dynamo-local": "sls dynamodb start",
     "codegen": "rm -rf .build && graphql-codegen --config codegen.yml",
-    "offline": "sls offline --printOutput"
+    "offline": "sls offline",
+    "offline-show-response": "sls offline --printOutput"
   },
   "dependencies": {
     "apollo": "^2.21.1",
