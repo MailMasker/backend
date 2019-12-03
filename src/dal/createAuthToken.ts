@@ -30,7 +30,7 @@ export function createAuthToken({ ddb }: DALContext, userID: string) {
           );
           reject(err);
         } else {
-          console.info(`Successfully created auth toekn for userID ${userID}`);
+          console.info(`Successfully created auth token for userID ${userID}`);
           // TODO: print everything in debug mode! And turn off debug mode in production
           // console.debug(`Successfully got auth for user ${data.username}`);
           resolve({

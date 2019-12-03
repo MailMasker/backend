@@ -1,3 +1,13 @@
+input AuthenticateInput {
+  username: String!
+}
+
+type AuthenticatePayload {
+  success: Boolean!
+  errorMessage: String
+  authToken: String
+}
+
 input CreateUserInput {
   uuid: String!
   username: String!
@@ -6,9 +16,9 @@ input CreateUserInput {
 
 type CreateUserPayload {
   success: Boolean!
-  userID: String
-  token: String
   errorMessage: String
+  userID: String
+  authToken: String
 }
 
 type User {
@@ -23,5 +33,6 @@ type Query {
 }
 
 type Mutation {
+  authenticate(input: AuthenticateInput!): AuthenticatePayload!
   createUser(input: CreateUserInput!): CreateUserPayload!
 }

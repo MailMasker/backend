@@ -10,6 +10,17 @@ export type Scalars = {
   Float: number,
 };
 
+export type AuthenticateInput = {
+  username: Scalars['String'],
+};
+
+export type AuthenticatePayload = {
+   __typename?: 'AuthenticatePayload',
+  success: Scalars['Boolean'],
+  errorMessage?: Maybe<Scalars['String']>,
+  authToken?: Maybe<Scalars['String']>,
+};
+
 export type CreateUserInput = {
   uuid: Scalars['String'],
   username: Scalars['String'],
@@ -19,14 +30,20 @@ export type CreateUserInput = {
 export type CreateUserPayload = {
    __typename?: 'CreateUserPayload',
   success: Scalars['Boolean'],
-  userID?: Maybe<Scalars['String']>,
-  token?: Maybe<Scalars['String']>,
   errorMessage?: Maybe<Scalars['String']>,
+  userID?: Maybe<Scalars['String']>,
+  authToken?: Maybe<Scalars['String']>,
 };
 
 export type Mutation = {
    __typename?: 'Mutation',
+  authenticate: AuthenticatePayload,
   createUser: CreateUserPayload,
+};
+
+
+export type MutationAuthenticateArgs = {
+  input: AuthenticateInput
 };
 
 
@@ -123,9 +140,11 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>,
   String: ResolverTypeWrapper<Scalars['String']>,
   Mutation: ResolverTypeWrapper<{}>,
+  AuthenticateInput: AuthenticateInput,
+  AuthenticatePayload: ResolverTypeWrapper<AuthenticatePayload>,
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   CreateUserInput: CreateUserInput,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -134,19 +153,28 @@ export type ResolversParentTypes = ResolversObject<{
   User: User,
   String: Scalars['String'],
   Mutation: {},
+  AuthenticateInput: AuthenticateInput,
+  AuthenticatePayload: AuthenticatePayload,
+  Boolean: Scalars['Boolean'],
   CreateUserInput: CreateUserInput,
   CreateUserPayload: CreateUserPayload,
-  Boolean: Scalars['Boolean'],
+}>;
+
+export type AuthenticatePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthenticatePayload'] = ResolversParentTypes['AuthenticatePayload']> = ResolversObject<{
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
+  errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
 export type CreateUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateUserPayload'] = ResolversParentTypes['CreateUserPayload']> = ResolversObject<{
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
-  userID?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
-  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  userID?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  authToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  authenticate?: Resolver<ResolversTypes['AuthenticatePayload'], ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'input'>>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>,
 }>;
 
@@ -162,6 +190,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
+  AuthenticatePayload?: AuthenticatePayloadResolvers<ContextType>,
   CreateUserPayload?: CreateUserPayloadResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,

@@ -35,7 +35,10 @@ export function createUser(
       username: string;
       email: string;
     };
-    authToken: string;
+    auth: {
+      authToken: string;
+      expires: number;
+    };
   }>((resolve, reject) => {
     ctx.ddb.putItem(params, function(err, data) {
       if (err) {
@@ -46,17 +49,17 @@ export function createUser(
         // TODO: print everything in debug mode! And turn off debug mode in production
         // console.debug(`Successfully got auth for user ${data.username}`);
 
-        createAuthToken(ctx, userID).then(({ authToken }) => {
-          console.info(
-            `Successfully created the first auth token for userID ${userID}`
-          );
+        createAuthToken(ctx, userID).then(({ authToken, expires }) => {
           resolve({
             user: {
               id: userID,
               username: userData.username,
               email: userData.email
             },
-            authToken
+            auth: {
+              authToken,
+              expires
+            }
           });
         });
       }

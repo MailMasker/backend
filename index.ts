@@ -11,6 +11,7 @@ import {
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import { DALContext } from "./src/dal/DALContext";
+import { authenticate } from "./src/api/mutations/authenticate";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createUser } from "./src/api/mutations/createUser";
@@ -37,6 +38,7 @@ const queryResolvers: QueryResolvers = {
 };
 
 const mutationResolvers: MutationResolvers = {
+  authenticate,
   createUser
 };
 

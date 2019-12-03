@@ -5,7 +5,6 @@ export function userForID(
   { ddb }: DALContext,
   userID: string
 ): Promise<{ username: string; email: string; id: string }> {
-  console.log("getting user data for id", userID);
   const params = {
     TableName: "user",
     Key: {
@@ -15,8 +14,6 @@ export function userForID(
 
   return new Promise((resolve, reject) => {
     ddb.getItem(params, (err, data) => {
-      console.log("item", data.Item);
-      console.log("item", JSON.stringify(data.Item));
       if (err) {
         console.error(
           new Error(`Error getting userID from token: ${JSON.stringify(err)}`)
@@ -39,8 +36,6 @@ export function userForID(
           email: data.Item.Email.S
         });
       } else {
-        console.log("data", data.Item);
-        console.log("data", JSON.stringify(data.Item));
         // TODO: localize string
         reject(new ApolloError("Unknown error"));
       }
