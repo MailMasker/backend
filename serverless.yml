@@ -49,8 +49,8 @@ resources:
           - AttributeName: Token
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
     user:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -58,12 +58,24 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
+          - AttributeName: Username
+            AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: Username
+            KeySchema:
+              - AttributeName: Username
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     route:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -75,5 +87,5 @@ resources:
           - AttributeName: To
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

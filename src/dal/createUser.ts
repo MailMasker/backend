@@ -15,14 +15,15 @@ export function createUser(
     requestUUID: string;
   }
 ) {
-  const userID: string = uuid();
+  const userID = uuid();
 
   const params = {
     TableName: "user",
     Item: {
       ID: { S: userID },
       Username: { S: userData.username },
-      Email: { S: userData.email }
+      Email: { S: userData.email },
+      UUID: { S: userData.requestUUID }
     }
   };
 
