@@ -13,10 +13,9 @@ export const createUser = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  let user: any
+  let user: any;
   try {
     user = await userForUsername(dalContext, args.input.username);
-    console.log("user", user);
   } catch (err) {
     // This is good: we want to fail to fetch a user by this username
   }

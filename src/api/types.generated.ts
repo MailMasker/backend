@@ -35,6 +35,14 @@ export type CreateUserPayload = {
   authToken?: Maybe<Scalars['String']>,
 };
 
+export type MaskedEmail = {
+   __typename?: 'MaskedEmail',
+  base: Scalars['String'],
+  domain: Scalars['String'],
+  expires?: Maybe<Scalars['Int']>,
+  deleted?: Maybe<Scalars['Boolean']>,
+};
+
 export type Mutation = {
    __typename?: 'Mutation',
   authenticate: AuthenticatePayload,
@@ -57,11 +65,18 @@ export type Query = {
   ping: Scalars['String'],
 };
 
+export type Route = {
+   __typename?: 'Route',
+  from: MaskedEmail,
+  to: Scalars['String'],
+};
+
 export type User = {
    __typename?: 'User',
   id: Scalars['String'],
   username: Scalars['String'],
   email: Scalars['String'],
+  routes: Array<Route>,
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -139,10 +154,13 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>,
   User: ResolverTypeWrapper<User>,
   String: ResolverTypeWrapper<Scalars['String']>,
+  Route: ResolverTypeWrapper<Route>,
+  MaskedEmail: ResolverTypeWrapper<MaskedEmail>,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   Mutation: ResolverTypeWrapper<{}>,
   AuthenticateInput: AuthenticateInput,
   AuthenticatePayload: ResolverTypeWrapper<AuthenticatePayload>,
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   CreateUserInput: CreateUserInput,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
 }>;
@@ -152,10 +170,13 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {},
   User: User,
   String: Scalars['String'],
+  Route: Route,
+  MaskedEmail: MaskedEmail,
+  Int: Scalars['Int'],
+  Boolean: Scalars['Boolean'],
   Mutation: {},
   AuthenticateInput: AuthenticateInput,
   AuthenticatePayload: AuthenticatePayload,
-  Boolean: Scalars['Boolean'],
   CreateUserInput: CreateUserInput,
   CreateUserPayload: CreateUserPayload,
 }>;
@@ -173,6 +194,13 @@ export type CreateUserPayloadResolvers<ContextType = any, ParentType extends Res
   authToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
+export type MaskedEmailResolvers<ContextType = any, ParentType extends ResolversParentTypes['MaskedEmail'] = ResolversParentTypes['MaskedEmail']> = ResolversObject<{
+  base?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  expires?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>,
+}>;
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   authenticate?: Resolver<ResolversTypes['AuthenticatePayload'], ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'input'>>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>,
@@ -183,17 +211,25 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
+export type RouteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Route'] = ResolversParentTypes['Route']> = ResolversObject<{
+  from?: Resolver<ResolversTypes['MaskedEmail'], ParentType, ContextType>,
+  to?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  routes?: Resolver<Array<ResolversTypes['Route']>, ParentType, ContextType>,
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
   AuthenticatePayload?: AuthenticatePayloadResolvers<ContextType>,
   CreateUserPayload?: CreateUserPayloadResolvers<ContextType>,
+  MaskedEmail?: MaskedEmailResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
+  Route?: RouteResolvers<ContextType>,
   User?: UserResolvers<ContextType>,
 }>;
 

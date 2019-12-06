@@ -25,6 +25,19 @@ type User {
   id: String!
   username: String!
   email: String!
+  routes: [Route!]!
+}
+
+type MaskedEmail {
+  base: String!
+  domain: String!
+  expires: Int
+  deleted: Boolean
+}
+
+type Route {
+  from: MaskedEmail!
+  to: String!
 }
 
 type Query {
