@@ -1,8 +1,12 @@
 import { DALContext } from "./DALContext";
+import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 
-export function createAuthToken({ ddb }: DALContext, userID: string) {
-  const authToken: string = uuid();
+export function createAuthToken(
+  { ddb }: DALContext,
+  authToken: string,
+  userID: string
+) {
   const exp = new Date();
   const numDaysExpires = 365;
   const expires = Math.floor(
@@ -12,7 +16,7 @@ export function createAuthToken({ ddb }: DALContext, userID: string) {
   const params = {
     TableName: "auth",
     Item: {
-      Token: { S: authToken },
+      AuthToken: { S: authToken },
       UserID: { S: userID },
       Expires: { N: `${expires}` }
     }
@@ -20,9 +24,6 @@ export function createAuthToken({ ddb }: DALContext, userID: string) {
 
   return new Promise<{ authToken: string; expires: number }>(
     (resolve, reject) => {
-      // TODO: SHA256 tokens before storing – https://security.stackexchange.com/a/151262 – that way auth tokens can't be taken from the db and used to impersonate users
-      // Or try this: https://github.com/accounts-js/accounts
-
       ddb.putItem(params, function(err, data) {
         if (err) {
           console.error(
@@ -31,8 +32,6 @@ export function createAuthToken({ ddb }: DALContext, userID: string) {
           reject(err);
         } else {
           console.info(`Successfully created auth token for userID ${userID}`);
-          // TODO: print everything in debug mode! And turn off debug mode in production
-          // console.debug(`Successfully got auth for user ${data.username}`);
           resolve({
             authToken,
             expires

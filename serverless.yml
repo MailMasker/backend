@@ -43,10 +43,10 @@ resources:
       Properties:
         TableName: auth
         AttributeDefinitions:
-          - AttributeName: Token
+          - AttributeName: AuthToken
             AttributeType: S
         KeySchema:
-          - AttributeName: Token
+          - AttributeName: AuthToken
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
@@ -58,7 +58,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: Username
+          - AttributeName: Email
             AttributeType: S
         KeySchema:
           - AttributeName: ID
@@ -67,9 +67,9 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
-          - IndexName: Username
+          - IndexName: Email
             KeySchema:
-              - AttributeName: Username
+              - AttributeName: Email
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

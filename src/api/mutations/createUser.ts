@@ -1,11 +1,11 @@
+import { ApolloError, InvalidGraphQLRequestError } from "apollo-server-core";
 import {
   AuthenticatedResolverContext,
   ResolverContext
 } from "../lib/ResolverContext";
 
-import { ApolloError } from "apollo-server-core";
 import { createUser as dalCreateUser } from "../../dal/createUser";
-import { userForUsername } from "../../dal/userForUsername";
+import { userForEmail } from "../../dal/userForEmail";
 
 export const createUser = async (
   parent,
@@ -13,28 +13,36 @@ export const createUser = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  let user: any;
+  let existingUser: any;
   try {
-    user = await userForUsername(dalContext, args.input.username);
+    existingUser = await userForEmail(dalContext, args.input.email);
   } catch (err) {
-    // This is good: we want to fail to fetch a user by this username
-  }
-  if (user) {
-    throw new ApolloError("Username already exists");
+    // This is good: we want to fail to fetch a user by this email
   }
 
-  // TODO: do better error handling here: handle the case where username is taken
-  // https://www.apollographql.com/docs/apollo-server/data/errors/
+  // TODO: someday handle UDID duplicates, but need to check for password match (maybe just call authenticate() ?)
+  //
+  // if (user) {
+  //   if (user.uuid === args.input.uuid) {
+  //     console.info(
+  //       `creation skipped because duplicate creation request detected with UUID ${args.input.uuid}`
+  //     );
+  //     const { authToken, expires } = await createAuthToken(dalContext, user.id);
+  //     return { userID: user.id, authToken: authToken, success: true };
+  //   }
+  //   throw new ApolloError("User with email already exists");
+  // }
+
   const {
-    user: { id },
-    auth: { authToken, expires }
+    user: { id: userID, email },
+    authToken
   } = await dalCreateUser(dalContext, {
-    username: args.input.username,
     email: args.input.email,
+    password: args.input.password,
     requestUUID: args.input.uuid
   });
 
-  setAuthCookie(authToken, expires);
+  setAuthCookie(authToken);
 
-  return { userID: id, authToken: authToken, success: true };
+  return { userID, success: true };
 };

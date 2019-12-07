@@ -1,23 +1,40 @@
-import {
-  AuthenticatedResolverContext,
-  ResolverContext
-} from "../lib/ResolverContext";
-
-import { AuthenticatePayload } from "../types.generated";
+import { ApolloError } from "apollo-server-core";
+import { JWT_SECRET } from "../../..";
+import { MutationAuthenticateArgs } from "../types.generated";
+import { ResolverContext } from "../lib/ResolverContext";
+import bcrypt from "bcrypt";
 import { createAuthToken } from "../../dal/createAuthToken";
-import { userForUsername } from "../../dal/userForUsername";
+import jwt from "jsonwebtoken";
+import { userForEmail } from "../../dal/userForEmail";
+
+// TODO: implement rate limiting
 
 export const authenticate = async (
   parent,
-  args,
+  args: MutationAuthenticateArgs,
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  const user = await userForUsername(dalContext, args.input.username);
+  try {
+    const user = await userForEmail(dalContext, args.input.email);
 
-  const { authToken, expires } = await createAuthToken(dalContext, user.id);
+    if (!bcrypt.compareSync(args.input.password, user.passwordHash)) {
+      throw new ApolloError("Password mismatch");
+    }
 
-  setAuthCookie(authToken, expires);
+    const authToken = jwt.sign(
+      { email: user.email, userID: user.id },
+      JWT_SECRET
+    );
 
-  return { userID: user.id, authToken: authToken, success: true };
+    await createAuthToken(dalContext, authToken, user.id);
+
+    setAuthCookie(authToken);
+
+    return { userID: user.id, authToken, success: true };
+  } catch (error) {
+    throw new ApolloError(
+      "User with email provided could not be found or the password you provided doesn't match"
+    );
+  }
 };

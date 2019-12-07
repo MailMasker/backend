@@ -1,9 +1,12 @@
 import { DALContext } from "../../dal/DALContext";
 
 export interface ResolverContext {
-  setAuthCookie: (token: string, expires: number) => void;
+  setAuthCookie: (authToken: string) => void;
+  clearAuthCookie: () => void;
   dalContext: DALContext;
+  authToken?: string;
 }
+
 export interface AuthenticatedResolverContext extends ResolverContext {
   currentUserID?: string;
 }

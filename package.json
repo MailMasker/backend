@@ -8,15 +8,19 @@
   "dependencies": {
     "apollo": "^2.21.1",
     "apollo-server-lambda": "^2.9.9",
+    "bcrypt": "^3.0.7",
     "cookie-parser": "^1.4.4",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^1.8.3",
     "@graphql-codegen/introspection": "1.8.3",
     "@graphql-codegen/typescript": "1.8.3",
     "@graphql-codegen/typescript-resolvers": "1.8.3",
+    "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.2",
+    "@types/jsonwebtoken": "^8.3.5",
     "@types/uuid": "^3.4.6",
     "apollo-server-express": "^2.9.12",
     "aws-sdk": "^2.573.0",

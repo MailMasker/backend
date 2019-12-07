@@ -1,5 +1,6 @@
 input AuthenticateInput {
-  username: String!
+  email: String!
+  password: String!
 }
 
 type AuthenticatePayload {
@@ -8,36 +9,95 @@ type AuthenticatePayload {
   authToken: String
 }
 
+input UnauthenticateInput {
+  token: String
+}
+
+type UnauthenticatePayload {
+  success: Boolean!
+  errorMessage: String
+}
+
 input CreateUserInput {
   uuid: String!
-  username: String!
   email: String!
+  password: String!
 }
 
 type CreateUserPayload {
   success: Boolean!
   errorMessage: String
-  userID: String
+  userID: ID
   authToken: String
 }
 
-type User {
-  id: String!
-  username: String!
-  email: String!
-  routes: [Route!]!
-}
-
-type MaskedEmail {
-  base: String!
-  domain: String!
+input CreateRouteInput {
+  forwardTo: String!
+  inboundToMaskedEmailID: ID!
   expires: Int
-  deleted: Boolean
 }
 
+# A Route can not be deleted, but its forwardTo property can be cleared at a user's request
 type Route {
-  from: MaskedEmail!
-  to: String!
+  id: ID!
+  # If deleted is true, then forwardTo will contain a random string
+  forwardTo: String
+  inboundTo: MaskedEmail!
+  expires: Int
+  disabled: Boolean!
+  deleted: Boolean!
+}
+
+type CreateRoutePayload {
+  success: Boolean!
+  errorMessage: String
+  route: Route
+}
+type DeleteUserPayload {
+  success: Boolean!
+  errorMessage: String
+  authToken: String
+}
+
+input DeleteRouteInput {
+  id: ID!
+}
+
+type DeleteRoutePayload {
+  success: Boolean!
+  errorMessage: String
+}
+
+input UpdateRouteInput {
+  id: ID!
+  forwardTo: String
+  inboundToMaskedEmailID: ID!
+  expires: Int
+}
+
+type UpdateRoutePayload {
+  success: Boolean!
+  errorMessage: String
+}
+
+# Once created, a MaskedEmail is reserved forever so that it cannot be used by another user
+# A MaskedEmail cannot be deleted, but a Route.forwardTo can be deleted because it's important for users' data rights.
+type MaskedEmail {
+  id: ID!
+  # OwnerUserID could belong to a deleted user
+  ownerUserID: ID!
+  # For x+y@1nt.email, "x" is the base
+  base: String!
+  # For x+y@1nt.email, "1nt.email" is the domain
+  domain: String!
+}
+
+# A User can't be deleted, but its email can be cleared at a user's request
+type User {
+  id: ID!
+  email: String
+  # routes: [Route!]!
+  # maskedEmails: [MaskedEmail!]!
 }
 
 type Query {
@@ -47,5 +107,11 @@ type Query {
 
 type Mutation {
   authenticate(input: AuthenticateInput!): AuthenticatePayload!
+  unauthenticate(input: UnauthenticateInput!): UnauthenticatePayload!
+
   createUser(input: CreateUserInput!): CreateUserPayload!
+
+  # createRoute(input: CreateRouteInput!): CreateRoutePayload!
+  # deleteRoute(input: DeleteRouteInput!): DeleteRoutePayload!
+  # updateRoute(input: UpdateRouteInput!): UpdateRoutePayload!
 }

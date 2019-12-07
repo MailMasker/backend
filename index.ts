@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 // @ts-ignore
 import * as aws from "aws-sdk";
 import * as fs from "fs";
@@ -12,15 +14,21 @@ import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
+import { authenticated } from "./src/api/lib/authenticated";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createUser } from "./src/api/mutations/createUser";
 import { raw as ddb } from "serverless-dynamodb-client";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
+import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
+import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { userIDForToken } from "./src/dal/userIDForToken";
+
+// TODO: Follow https://serverless.com/blog/aws-secrets-management/ to store secrets in production
+export const JWT_SECRET = "W2UBYMsADD$ZDfrXJMnvHcWm";
 
 const OneYear = 60 * 60 * 24 * 365;
 
@@ -34,11 +42,12 @@ const queryResolvers: QueryResolvers = {
   ping: (parent, args, context, info) => {
     return "pong";
   },
-  me
+  me: authenticated(me)
 };
 
 const mutationResolvers: MutationResolvers = {
   authenticate,
+  unauthenticate: authenticated(unauthenticate),
   createUser
 };
 
@@ -55,27 +64,41 @@ const server = new ApolloServer({
   },
   introspection: true,
   context: async ({ req, res }) => {
-    const token = req.cookies.Authorization || req.headers.Authorization;
+    const authToken = req.cookies.jwt || req.headers.Authorization;
 
     let userID: string | undefined;
-    if (token) {
-      try {
-        userID = await userIDForToken(dalContext, token);
-      } catch (error) {
-        console.warn("Error getting userID: ", error);
-      }
+    if (authToken) {
+      // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
+      const { userID, email } = jwt.verify(authToken, JWT_SECRET) as {
+        userID: string;
+        email: string;
+      };
+
+      // This is not longer needed due to JWTs
+      //
+      // try {
+      //   userID = await userIDForToken(dalContext, authToken);
+      // } catch (error) {
+      //   console.warn("Error getting userID: ", error);
+      // }
     }
 
     const context: ResolverContext | AuthenticatedResolverContext = {
       currentUserID: userID,
       dalContext,
-      setAuthCookie: (token: string) => {
-        // TODO: make max-age shorter if marked as a public computer
-        res.setHeader(
-          "Set-Cookie",
-          `Authorization=${token}; Max-Age=${OneYear}`
-        );
-      }
+      setAuthCookie: authToken => {
+        res.cookie("jwt", authToken, {
+          httpOnly: true
+          // TODO: turn this on for prod eventually
+          //secure: true, //on HTTPS
+          // TODO: set example for dev and prod and local
+          //domain: 'example.com', //set your domain
+        });
+      },
+      clearAuthCookie: () => {
+        res.clearCookie("jwt");
+      },
+      authToken
     };
     return context;
   }
@@ -86,7 +109,7 @@ const app = express();
 app.use(cookieParser());
 
 var corsOptions = {
-  origin: true,
+  origin: "http://localhost:3000",
   credentials: true
 };
 app.use(cors(corsOptions));

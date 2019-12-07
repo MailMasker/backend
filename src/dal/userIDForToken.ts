@@ -1,14 +1,15 @@
 import { ApolloError } from "apollo-server-core";
 import { DALContext } from "./DALContext";
+import bcrypt from "bcrypt";
 
 export function userIDForToken(
   { ddb }: DALContext,
-  token: string
+  authToken: string
 ): Promise<string> {
   const params = {
     TableName: "auth",
     Key: {
-      Token: { S: token }
+      AuthToken: { S: authToken }
     }
   };
 
@@ -25,7 +26,6 @@ export function userIDForToken(
         );
         resolve(data.Item.UserID.S);
       } else {
-        // TODO: localize string
         reject(new ApolloError("Unknown error"));
       }
     });

@@ -1,10 +1,15 @@
 import { ApolloError } from "apollo-server-core";
 import { DALContext } from "./DALContext";
 
-export function userForUsername(
+export function userForEmail(
   { ddb }: DALContext,
   username: string
-): Promise<{ username: string; email: string; id: string }> {
+): Promise<{
+  username: string;
+  email: string;
+  id: string;
+  passwordHash: string;
+}> {
   var params = {
     TableName: "user",
     IndexName: "Username",
@@ -26,7 +31,6 @@ export function userForUsername(
           console.error(
             new Error(`Unexpected data.Items of length ${data.Items.length}`)
           );
-          // TODO: localize string
           reject(new ApolloError("Unknown error"));
         } else {
           let userItem = data.Items[0];
@@ -37,20 +41,21 @@ export function userForUsername(
             userItem.ID &&
             userItem.ID.S &&
             userItem.Email &&
-            userItem.Email.S
+            userItem.Email.S &&
+            userItem.PasswordHash &&
+            userItem.PasswordHash.S
           ) {
             resolve({
               username: userItem.Username.S,
               id: userItem.ID.S,
-              email: userItem.Email.S
+              email: userItem.Email.S,
+              passwordHash: userItem.PasswordHash.S
             });
           } else {
-            // TODO: localize string
             reject(new ApolloError("Unknown error"));
           }
         }
       } else {
-        // TODO: localize string
         reject(new ApolloError("Unknown error"));
       }
     });
