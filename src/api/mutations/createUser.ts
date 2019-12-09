@@ -28,14 +28,14 @@ export const createUser = async (
 
   const {
     user: { id: userID, email },
-    authToken
+    auth: { authToken, expires }
   } = await dalCreateUser(dalContext, {
     email: args.input.email,
     password: args.input.password,
     requestUUID: args.input.uuid
   });
 
-  setAuthCookie(authToken);
+  setAuthCookie({ authToken, expires });
 
   return { userID, success: true };
 };

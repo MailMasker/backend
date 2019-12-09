@@ -34,7 +34,7 @@ export function createUser(
       id: string;
       email: string;
     };
-    authToken: string;
+    auth: { authToken: string; expires: number };
   }>((resolve, reject) => {
     ctx.ddb.putItem(params, function(err, data) {
       if (err) {
@@ -52,7 +52,7 @@ export function createUser(
                 id: userID,
                 email: userData.email
               },
-              authToken
+              auth: { authToken, expires }
             });
           })
           .catch(error => {
