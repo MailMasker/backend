@@ -1,11 +1,7 @@
-import { ApolloError, InvalidGraphQLRequestError } from "apollo-server-core";
-import {
-  AuthenticatedResolverContext,
-  ResolverContext
-} from "../lib/ResolverContext";
-
+import { ApolloError } from "apollo-server-core";
+import { ResolverContext } from "../lib/ResolverContext";
 import { createUser as dalCreateUser } from "../../dal/createUser";
-import { userForEmail } from "../../dal/userForEmail";
+import { isAccountEmailTaken } from "../../dal/isAccountEmailTaken";
 
 export const createUser = async (
   parent,
@@ -13,11 +9,8 @@ export const createUser = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  let existingUser: any;
-  try {
-    existingUser = await userForEmail(dalContext, args.input.email);
-  } catch (err) {
-    // This is good: we want to fail to fetch a user by this email
+  if (await isAccountEmailTaken(dalContext, { email: args.input.email })) {
+    throw new ApolloError("User with email already exists");
   }
 
   // TODO: someday handle UDID duplicates, but need to check for password match (maybe just call authenticate() ?)

@@ -1,7 +1,7 @@
 import { DALContext } from "../../dal/DALContext";
 
 export interface ResolverContext {
-  setAuthCookie: (authToken: string) => void;
+  setAuthCookie: ({ authToken: string, expires: number }) => void;
   clearAuthCookie: () => void;
   dalContext: DALContext;
   authToken?: string;

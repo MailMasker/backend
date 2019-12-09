@@ -3,41 +3,42 @@ import { DALContext } from "./DALContext";
 
 export function userForEmail(
   { ddb }: DALContext,
-  username: string
+  { email }: { email: string }
 ): Promise<{
-  username: string;
   email: string;
   id: string;
   passwordHash: string;
 }> {
   var params = {
     TableName: "user",
-    IndexName: "Username",
-    KeyConditionExpression: "Username = :username",
+    IndexName: "Email",
+    KeyConditionExpression: "Email = :email",
     ExpressionAttributeValues: {
-      ":username": { S: username }
+      ":email": { S: email }
     }
   };
+  console.log("userForEmail query starting");
 
   return new Promise((resolve, reject) => {
     ddb.query(params, (err, data) => {
+      console.log("userForEmail query finished");
       if (err) {
         console.error(
           new Error(`Error getting user from username: ${JSON.stringify(err)}`)
         );
         reject(err);
       } else if (data && data.Items) {
+        console.log("userForEmail checking items length");
         if (data.Items.length > 1) {
           console.error(
             new Error(`Unexpected data.Items of length ${data.Items.length}`)
           );
           reject(new ApolloError("Unknown error"));
         } else {
+          console.log("userForEmail items length 1: ", data.Items[0]);
           let userItem = data.Items[0];
           if (
             userItem &&
-            userItem.Username &&
-            userItem.Username.S &&
             userItem.ID &&
             userItem.ID.S &&
             userItem.Email &&
@@ -46,7 +47,6 @@ export function userForEmail(
             userItem.PasswordHash.S
           ) {
             resolve({
-              username: userItem.Username.S,
               id: userItem.ID.S,
               email: userItem.Email.S,
               passwordHash: userItem.PasswordHash.S

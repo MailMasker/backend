@@ -45,15 +45,19 @@ export function createUser(
 
         const token = jwt.sign({ email: userData.email, userID }, JWT_SECRET);
 
-        createAuthToken(ctx, token, userID).then(({ authToken, expires }) => {
-          resolve({
-            user: {
-              id: userID,
-              email: userData.email
-            },
-            authToken: token
+        createAuthToken(ctx, token, userID)
+          .then(({ authToken, expires }) => {
+            resolve({
+              user: {
+                id: userID,
+                email: userData.email
+              },
+              authToken
+            });
+          })
+          .catch(error => {
+            reject(error);
           });
-        });
       }
     });
   });

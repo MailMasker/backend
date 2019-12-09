@@ -66,15 +66,16 @@ const server = new ApolloServer({
   context: async ({ req, res }) => {
     const authToken = req.cookies.jwt || req.headers.Authorization;
 
-    let userID: string | undefined;
+    let currentUserID: string | undefined;
     if (authToken) {
       // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
       const { userID, email } = jwt.verify(authToken, JWT_SECRET) as {
         userID: string;
         email: string;
       };
+      currentUserID = userID;
 
-      // This is not longer needed due to JWTs
+      // This is no longer needed due to JWTs
       //
       // try {
       //   userID = await userIDForToken(dalContext, authToken);
@@ -83,12 +84,15 @@ const server = new ApolloServer({
       // }
     }
 
+    console.log("currentUserID", currentUserID);
+
     const context: ResolverContext | AuthenticatedResolverContext = {
-      currentUserID: userID,
+      currentUserID,
       dalContext,
-      setAuthCookie: authToken => {
+      setAuthCookie: ({ authToken, expires }) => {
         res.cookie("jwt", authToken, {
-          httpOnly: true
+          httpOnly: true,
+          maxAge: expires
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
           // TODO: set example for dev and prod and local

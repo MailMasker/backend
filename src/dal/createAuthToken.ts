@@ -1,6 +1,4 @@
 import { DALContext } from "./DALContext";
-import bcrypt from "bcrypt";
-import { v4 as uuid } from "uuid";
 
 export function createAuthToken(
   { ddb }: DALContext,
@@ -9,9 +7,7 @@ export function createAuthToken(
 ) {
   const exp = new Date();
   const numDaysExpires = 365;
-  const expires = Math.floor(
-    exp.setTime(exp.getTime() + numDaysExpires * 86400000) / 1000
-  );
+  const expires = Math.floor(exp.setTime(numDaysExpires * 86400000));
 
   const params = {
     TableName: "auth",

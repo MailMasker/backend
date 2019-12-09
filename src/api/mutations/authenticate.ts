@@ -16,20 +16,27 @@ export const authenticate = async (
   info
 ) => {
   try {
-    const user = await userForEmail(dalContext, args.input.email);
+    console.log("getting user for email: ", args.input);
+    const user = await userForEmail(dalContext, { email: args.input.email });
+
+    console.log("userfound: ", user);
 
     if (!bcrypt.compareSync(args.input.password, user.passwordHash)) {
       throw new ApolloError("Password mismatch");
     }
+
+    console.log("password matches");
 
     const authToken = jwt.sign(
       { email: user.email, userID: user.id },
       JWT_SECRET
     );
 
-    await createAuthToken(dalContext, authToken, user.id);
+    console.log("authtoken during authenticate: ", authToken);
 
-    setAuthCookie(authToken);
+    const { expires } = await createAuthToken(dalContext, authToken, user.id);
+
+    setAuthCookie({ authToken, expires });
 
     return { userID: user.id, authToken, success: true };
   } catch (error) {
