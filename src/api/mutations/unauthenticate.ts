@@ -9,7 +9,9 @@ export const unauthenticate = async (
   { clearAuthCookie, dalContext, authToken }: ResolverContext,
   info
 ) => {
-  let token = args.input.token || authToken;
+  const token =
+    (args.input && args.input.token ? args.input.token : undefined) ||
+    authToken;
   if (!token) {
     return {
       success: false,

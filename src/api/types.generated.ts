@@ -95,7 +95,7 @@ export type MutationAuthenticateArgs = {
 
 
 export type MutationUnauthenticateArgs = {
-  input: UnauthenticateInput
+  input?: Maybe<UnauthenticateInput>
 };
 
 
@@ -312,7 +312,7 @@ export type MaskedEmailResolvers<ContextType = any, ParentType extends Resolvers
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   authenticate?: Resolver<ResolversTypes['AuthenticatePayload'], ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'input'>>,
-  unauthenticate?: Resolver<ResolversTypes['UnauthenticatePayload'], ParentType, ContextType, RequireFields<MutationUnauthenticateArgs, 'input'>>,
+  unauthenticate?: Resolver<ResolversTypes['UnauthenticatePayload'], ParentType, ContextType, MutationUnauthenticateArgs>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>,
 }>;
 

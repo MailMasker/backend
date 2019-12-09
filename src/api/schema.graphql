@@ -10,6 +10,7 @@ type AuthenticatePayload {
 }
 
 input UnauthenticateInput {
+  # Token is optional because the server will first attempt to read the token from a cookie, if present
   token: String
 }
 
@@ -107,7 +108,7 @@ type Query {
 
 type Mutation {
   authenticate(input: AuthenticateInput!): AuthenticatePayload!
-  unauthenticate(input: UnauthenticateInput!): UnauthenticatePayload!
+  unauthenticate(input: UnauthenticateInput): UnauthenticatePayload!
 
   createUser(input: CreateUserInput!): CreateUserPayload!
 
