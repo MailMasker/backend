@@ -8,6 +8,7 @@ export function userForID(
 ): Promise<{
   id: string;
   email: string;
+  verifiedEmailIDs: string[];
   // routes: {}[];
   // maskedEmails: {}[];
 }> {
@@ -37,12 +38,16 @@ export function userForID(
         data.Item.Email &&
         data.Item.Email.S &&
         data.Item.EmailHash &&
-        data.Item.EmailHash.S
+        data.Item.EmailHash.S &&
+        data.Item.VerifiedEmailIDs.L
       ) {
         console.info(`Successfully got email for userID ${userID}`);
         resolve({
           id: data.Item.ID.S,
-          email: data.Item.Email.S
+          email: data.Item.Email.S,
+          verifiedEmailIDs: data.Item.VerifiedEmailIDs.L.map(
+            ({ S: verifiedEmailID }: { S: string }) => verifiedEmailID
+          )
           // routes: [],
           // maskedEmails: []
         });

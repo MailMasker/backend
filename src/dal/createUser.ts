@@ -25,7 +25,8 @@ export function createUser(
       Email: { S: userData.email },
       EmailHash: { S: emailHash },
       UUID: { S: userData.requestUUID },
-      Created: { N: String(new Date().getTime()) }
+      Created: { N: String(new Date().getTime()) },
+      VerifiedEmailIDs: { L: [] }
     }
   };
 

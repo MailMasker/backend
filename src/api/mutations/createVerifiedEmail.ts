@@ -28,10 +28,8 @@ export const createVerifiedEmail = async (
     );
   }
 
-  const { verifiedEmail } = await dal.createVerifiedEmail(dalContext, {
+  return await dal.createVerifiedEmail(dalContext, {
     email: args.email,
     userID: currentUserID
   });
-
-  return verifiedEmail;
 };

@@ -15,6 +15,7 @@ import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
+import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createRoute } from "./src/api/mutations/createRoute";
@@ -44,12 +45,12 @@ const queryResolvers: QueryResolvers = {
   ping: (parent, args, context, info) => {
     return "pong";
   },
-  me: authenticated(me)
+  me: combineResolvers(authenticated, me)
 };
 
 const mutationResolvers: MutationResolvers = {
   authenticate,
-  unauthenticate: authenticated(unauthenticate),
+  unauthenticate: combineResolvers(authenticated, unauthenticate),
 
   createUser,
 
