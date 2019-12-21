@@ -2,7 +2,7 @@
   "scripts": {
     "dynamo-local": "sls dynamodb start",
     "codegen": "rm -rf .build && graphql-codegen --config codegen.yml",
-    "offline": "sls offline",
+    "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline -s dev",
     "offline-show-response": "sls offline --printOutput"
   },
   "dependencies": {
