@@ -19,7 +19,7 @@ custom:
 
 package:
   include:
-    - src/api/schema.graphql
+    - src/api/schema/schema.graphql
 
 functions:
   graphql:
@@ -85,6 +85,19 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: To
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    verified-email:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: verified-email
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1

@@ -17,7 +17,9 @@ import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
+import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { raw as ddb } from "serverless-dynamodb-client";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
@@ -48,11 +50,16 @@ const queryResolvers: QueryResolvers = {
 const mutationResolvers: MutationResolvers = {
   authenticate,
   unauthenticate: authenticated(unauthenticate),
-  createUser
+
+  createUser,
+
+  createVerifiedEmail
+
+  // createRoute
 };
 
 const schema = fs.readFileSync(
-  path.join(__dirname, "./src/api/schema.graphql"),
+  path.join(__dirname, "./src/api/schema/schema.graphql"),
   "utf8"
 );
 
@@ -83,8 +90,6 @@ const server = new ApolloServer({
       //   console.warn("Error getting userID: ", error);
       // }
     }
-
-    console.log("currentUserID", currentUserID);
 
     const context: ResolverContext | AuthenticatedResolverContext = {
       currentUserID,

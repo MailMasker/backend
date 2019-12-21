@@ -17,25 +17,25 @@ export function userForEmail(
       ":email": { S: email }
     }
   };
-  console.log("userForEmail query starting");
+  console.debug("userForEmail query starting");
 
   return new Promise((resolve, reject) => {
     ddb.query(params, (err, data) => {
-      console.log("userForEmail query finished");
+      console.debug("userForEmail query finished");
       if (err) {
         console.error(
           new Error(`Error getting user from username: ${JSON.stringify(err)}`)
         );
         reject(err);
       } else if (data && data.Items) {
-        console.log("userForEmail checking items length");
+        console.debug("userForEmail checking items length");
         if (data.Items.length > 1) {
           console.error(
             new Error(`Unexpected data.Items of length ${data.Items.length}`)
           );
           reject(new ApolloError("Unknown error"));
         } else {
-          console.log("userForEmail items length 1: ", data.Items[0]);
+          console.debug("userForEmail items length 1: ", data.Items[0]);
           let userItem = data.Items[0];
           if (
             userItem &&

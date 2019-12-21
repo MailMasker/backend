@@ -1,6 +1,7 @@
 import { ApolloError } from "apollo-server-core";
 import { MutationUnauthenticateArgs } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
+import { UserInputError } from "apollo-server-express";
 import { deleteAuthToken } from "../../dal/deleteAuthToken";
 
 export const unauthenticate = async (
@@ -9,14 +10,11 @@ export const unauthenticate = async (
   { clearAuthCookie, dalContext, authToken }: ResolverContext,
   info
 ) => {
-  const token =
-    (args.input && args.input.token ? args.input.token : undefined) ||
-    authToken;
+  const token = (args && args.token ? args.token : undefined) || authToken;
   if (!token) {
-    return {
-      success: false,
-      errorMessage: "Unable to unauthenticate because auth token not provided"
-    };
+    throw new UserInputError(
+      "Unable to unauthenticate because auth token not provided"
+    );
   }
 
   try {
@@ -24,7 +22,7 @@ export const unauthenticate = async (
 
     clearAuthCookie();
 
-    return { success: true };
+    return true;
   } catch (error) {
     throw new ApolloError("Unknown error while unauthenticating");
   }

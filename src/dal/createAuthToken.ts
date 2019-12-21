@@ -9,7 +9,7 @@ export function createAuthToken(
   const numDaysExpires = 365;
   const expires = Math.floor(exp.setTime(numDaysExpires * 86400000));
 
-  console.log("expires", expires);
+  console.debug("expires", expires);
 
   const params = {
     TableName: "auth",

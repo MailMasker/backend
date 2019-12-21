@@ -1,0 +1,102 @@
+type CreateUserPayload {
+  userID: ID!
+}
+
+input CreateRouteInput {
+  redirectToVerifiedEmailID: ID!
+  emailMask: ID!
+}
+
+# A Route can not be hard deleted, but the email address in redirectToVerifiedEmailID property can be cleared at a user's request
+type Route {
+  id: ID!
+  # If deleted is true, then forwardTo will contain a random string
+  redirectToVerifiedEmailID: ID!
+  inboundTo: EmailMask!
+  expires: Int
+  disabled: Boolean!
+  deleted: Boolean!
+}
+
+type CreateRoutePayload {
+  route: Route
+}
+type DeleteUserPayload {
+  authToken: String
+}
+
+input DeleteRouteInput {
+  id: ID!
+}
+
+type DeleteRoutePayload {
+  success: Boolean!
+  errorMessage: String
+}
+
+input UpdateRouteInput {
+  id: ID!
+  forwardTo: String
+  inboundToEmailMaskID: ID!
+  expires: Int
+}
+
+type UpdateRoutePayload {
+  success: Boolean!
+  errorMessage: String
+}
+
+# Once created, an EmailMask is reserved forever so that it cannot be used by another user
+# An EmailMask cannot be deleted, but a Route.forwardTo can be deleted because it's important for users' data rights.
+type EmailMask {
+  id: ID!
+  # OwnerUserID could belong to a deleted user
+  ownerUserID: ID!
+  # For x+y@1nt.email, "x" is the base
+  base: String!
+  # For x+y@1nt.email, "1nt.email" is the domain
+  domain: String!
+  # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
+  raw: String!
+}
+
+# A User can't be deleted, but its email can be cleared at a user's request
+type User {
+  id: ID!
+  email: String
+  # routes: [Route!]!
+  # emailMasks: [EmailMask!]!
+  # verifiedEmails: [VerifiedEmail!]!
+}
+
+# A VerifiedEmail is one for which ownership has been verified when `verified` is true
+type VerifiedEmail {
+  id: ID!
+  # If deleted, then `email` will be null
+  email: String
+  verified: Boolean!
+}
+
+type Query {
+  me: User!
+  ping: String!
+}
+
+type Mutation {
+  authenticate(email: String!, password: String!): Boolean
+  # Token is optional because the server will first attempt to read the token from a cookie, if present
+  unauthenticate(token: String): Boolean
+
+  createUser(
+    email: String!
+    password: String!
+    uuid: String!
+  ): CreateUserPayload!
+
+  # returns the ID of the VerifiedEmail object
+  createVerifiedEmail(email: String!): VerifiedEmail!
+
+  # createRoute(input: CreateRouteInput!): CreateRoutePayload!
+  # deleteRoute(input: DeleteRouteInput!): DeleteRoutePayload!
+  # updateRoute(input: UpdateRouteInput!): UpdateRoutePayload!
+}
