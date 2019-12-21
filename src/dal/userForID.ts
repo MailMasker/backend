@@ -1,4 +1,5 @@
 import { ApolloError } from "apollo-server-core";
+import { AuthenticationError } from "apollo-server-express";
 import { DALContext } from "./DALContext";
 
 export function userForID(
@@ -46,7 +47,7 @@ export function userForID(
           // maskedEmails: []
         });
       } else {
-        reject(new ApolloError("Unknown error"));
+        reject(new AuthenticationError("UserID not found"));
       }
     });
   });

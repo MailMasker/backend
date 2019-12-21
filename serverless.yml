@@ -96,9 +96,21 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
+          - AttributeName: Email
+            AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: Email
+            KeySchema:
+              - AttributeName: Email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1

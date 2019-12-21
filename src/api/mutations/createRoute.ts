@@ -8,9 +8,9 @@ export const createRoute = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  if (await isAccountEmailTaken(dalContext, { email: args.email })) {
-    throw new UserInputError("User with email already exists");
-  }
+  // if (await isAccountEmailTaken(dalContext, { email: args.email })) {
+  //   throw new UserInputError("User with email already exists");
+  // }
 
   //   await dal.createRoute(dalContext, {
   //     to,

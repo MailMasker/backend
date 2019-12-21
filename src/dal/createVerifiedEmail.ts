@@ -1,12 +1,8 @@
 import { DALContext } from "./DALContext";
-import { JWT_SECRET } from "../..";
-import bcrypt from "bcrypt";
-import { createAuthToken } from "./createAuthToken";
-import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 
 export function createVerifiedEmail(
-  ctx: DALContext,
+  dalContext: DALContext,
   {
     userID,
     email
@@ -23,7 +19,8 @@ export function createVerifiedEmail(
     Item: {
       ID: { S: id },
       Email: { S: email },
-      Verified: { BOOL: verified }
+      Verified: { BOOL: verified },
+      OwnerUserID: { S: userID }
     }
   };
 
@@ -32,9 +29,10 @@ export function createVerifiedEmail(
       id: string;
       email: string;
       verified: boolean;
+      ownerUserID: string;
     };
   }>((resolve, reject) => {
-    ctx.ddb.putItem(params, function(err, data) {
+    dalContext.ddb.putItem(params, function(err, data) {
       if (err) {
         console.error(
           new Error(
@@ -44,10 +42,12 @@ export function createVerifiedEmail(
         reject(err);
       } else {
         console.debug(
-          `Successfully created verified email ${email} with userID ${userID}`
+          `Successfully created verified email ${email} / ${id} with userID ${userID}`
         );
 
-        resolve({ verifiedEmail: { id, email, verified } });
+        resolve({
+          verifiedEmail: { id, email, verified, ownerUserID: userID }
+        });
       }
     });
   });

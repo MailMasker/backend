@@ -3,8 +3,7 @@ import * as dal from "../../dal/createVerifiedEmail";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
-import { MutationCreateVerifiedEmailArgs } from "../types.generated";
-import { isAccountEmailTaken } from "../../dal/isAccountEmailTaken";
+import { verifiedEmailForEmail } from "../../dal/verifiedEmailForEmail";
 
 export const createVerifiedEmail = async (
   parent,
@@ -12,11 +11,21 @@ export const createVerifiedEmail = async (
   { setAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,
   info
 ) => {
-  if (await isAccountEmailTaken(dalContext, { email: args.email })) {
-    throw new UserInputError("User with email already exists");
-  }
   if (!currentUserID) {
     throw new AuthenticationError("Must be signed in");
+  }
+  const existingVerifiedEmail = await verifiedEmailForEmail(dalContext, {
+    email: args.email
+  });
+  if (existingVerifiedEmail) {
+    if (existingVerifiedEmail.verified) {
+      throw new UserInputError(
+        "The email address provided is already verified"
+      );
+    }
+    throw new UserInputError(
+      "The email address provided is already in the process of being verified, but has not yet been verified"
+    );
   }
 
   const { verifiedEmail } = await dal.createVerifiedEmail(dalContext, {
