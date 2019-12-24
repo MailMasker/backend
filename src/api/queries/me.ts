@@ -1,9 +1,11 @@
-import { authenticated } from "../lib/authenticated";
-import { userForID } from "../../dal/userForID";
+import { ResolversTypes } from "../types.generated";
 
-export const me = (parent, args, { dalContext, currentUserID }, info) => {
-  console.log("parent", parent);
-  console.log("args", args);
-  console.log("info", info);
-  return userForID(dalContext, currentUserID);
+export const me: ResolversTypes["me"] = (
+  parent,
+  args,
+  { dalContext, currentUserID },
+  info
+) => {
+  // the top-level User query returns the user
+  return {};
 };

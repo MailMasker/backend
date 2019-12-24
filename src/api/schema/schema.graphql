@@ -69,6 +69,10 @@ type User {
   verifiedEmails: [VerifiedEmail!]!
 }
 
+type Me {
+  user: User!
+}
+
 # A VerifiedEmail is one for which ownership has been verified when `verified` is true
 type VerifiedEmail {
   id: ID!
@@ -78,7 +82,7 @@ type VerifiedEmail {
 }
 
 type Query {
-  me: User!
+  me: Me!
   ping: String!
 }
 
