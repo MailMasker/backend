@@ -12,7 +12,7 @@
       "args": [
         "offline",
         "--noTimeout",
-        "--dontPrintOutput",
+        // "--dontPrintOutput",
         "--stage=local",
         "-P",
         "4000",
