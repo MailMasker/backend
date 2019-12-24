@@ -1,54 +1,54 @@
 import { ApolloError } from "apollo-server-core";
 import { DALContext } from "./DALContext";
 
-export function userForEmail(
+export function userForUsername(
   { ddb }: DALContext,
-  { email }: { email: string }
+  { username }: { username: string }
 ): Promise<{
-  email: string;
+  username: string;
   id: string;
   passwordHash: string;
 }> {
   var params = {
     TableName: "user",
-    IndexName: "Email",
-    KeyConditionExpression: "Email = :email",
+    IndexName: "Username",
+    KeyConditionExpression: "Username = :username",
     ExpressionAttributeValues: {
-      ":email": { S: email }
+      ":username": { S: username }
     }
   };
-  console.debug("userForEmail query starting");
+  console.debug("userForUsername query starting");
 
   return new Promise((resolve, reject) => {
     ddb.query(params, (err, data) => {
-      console.debug("userForEmail query finished");
+      console.debug("userForUsername query finished");
       if (err) {
         console.error(
           new Error(`Error getting user from username: ${JSON.stringify(err)}`)
         );
         reject(err);
       } else if (data && data.Items) {
-        console.debug("userForEmail checking items length");
+        console.debug("userForUsername checking items length");
         if (data.Items.length > 1) {
           console.error(
             new Error(`Unexpected data.Items of length ${data.Items.length}`)
           );
           reject(new ApolloError("Unknown error"));
         } else {
-          console.debug("userForEmail items length 1: ", data.Items[0]);
+          console.debug("userForUsername items length 1: ", data.Items[0]);
           let userItem = data.Items[0];
           if (
             userItem &&
             userItem.ID &&
             userItem.ID.S &&
-            userItem.Email &&
-            userItem.Email.S &&
+            userItem.Username &&
+            userItem.Username.S &&
             userItem.PasswordHash &&
             userItem.PasswordHash.S
           ) {
             resolve({
               id: userItem.ID.S,
-              email: userItem.Email.S,
+              username: userItem.Username.S,
               passwordHash: userItem.PasswordHash.S
             });
           } else {

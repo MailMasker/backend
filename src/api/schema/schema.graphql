@@ -60,10 +60,10 @@ type EmailMask {
   raw: String!
 }
 
-# A User can't be deleted, but its email can be cleared at a user's request
+# A User can't be deleted, but its username can be cleared at a user's request
 type User {
   id: ID!
-  email: String
+  username: String
   # routes: [Route!]!
   # emailMasks: [EmailMask!]!
   verifiedEmails: [VerifiedEmail!]!
@@ -87,12 +87,12 @@ type Query {
 }
 
 type Mutation {
-  authenticate(email: String!, password: String!): Boolean
+  authenticate(username: String!, password: String!): Boolean
   # Token is optional because the server will first attempt to read the token from a cookie, if present
   unauthenticate(token: String): Boolean
 
   createUser(
-    email: String!
+    username: String!
     password: String!
     uuid: String!
   ): CreateUserPayload!

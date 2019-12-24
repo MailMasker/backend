@@ -6,7 +6,7 @@ import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcrypt";
 import { createAuthToken } from "../../dal/createAuthToken";
 import jwt from "jsonwebtoken";
-import { userForEmail } from "../../dal/userForEmail";
+import { userForUsername } from "../../dal/userForEmail";
 
 // TODO: implement rate limiting
 
@@ -17,8 +17,8 @@ export const authenticate = async (
   info
 ) => {
   try {
-    console.debug("getting user for email: ", args.email);
-    const user = await userForEmail(dalContext, { email: args.email });
+    console.debug("getting user for username: ", args.username);
+    const user = await userForUsername(dalContext, { username: args.username });
 
     console.debug("userfound: ", user);
 
@@ -29,7 +29,7 @@ export const authenticate = async (
     console.debug("password matches");
 
     const authToken = jwt.sign(
-      { email: user.email, userID: user.id },
+      { username: user.username, userID: user.id },
       JWT_SECRET
     );
 
@@ -42,7 +42,7 @@ export const authenticate = async (
     return true;
   } catch (error) {
     throw new UserInputError(
-      "User with email provided could not be found or the password you provided doesn't match"
+      "User with username provided could not be found or the password you provided doesn't match"
     );
   }
 };

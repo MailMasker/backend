@@ -77,9 +77,9 @@ const server = new ApolloServer({
     let currentUserID: string | undefined;
     if (authToken) {
       // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
-      const { userID, email } = jwt.verify(authToken, JWT_SECRET) as {
+      const { userID, username } = jwt.verify(authToken, JWT_SECRET) as {
         userID: string;
-        email: string;
+        username: string;
       };
       currentUserID = userID;
 

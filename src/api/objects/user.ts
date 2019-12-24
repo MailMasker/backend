@@ -22,14 +22,14 @@ export const user: ResolversTypes["user"] = async (
   if (!currentUserID) {
     throw new AuthenticationError("Authentication required");
   }
-  const { id, email, verifiedEmailIDs } = await userForID(
+  const { id, username, verifiedEmailIDs } = await userForID(
     dalContext,
     currentUserID
   );
 
   return {
     id,
-    email,
+    username,
     verifiedEmails: () =>
       Promise.all(
         verifiedEmailIDs.map(id => dal.verifiedEmailByID(dalContext, id))

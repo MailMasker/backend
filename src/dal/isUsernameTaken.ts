@@ -1,16 +1,16 @@
 import { ApolloError } from "apollo-server-core";
 import { DALContext } from "./DALContext";
 
-export function isAccountEmailTaken(
+export function isUsernameTaken(
   { ddb }: DALContext,
-  { email }: { email: string }
+  { username }: { username: string }
 ): Promise<boolean> {
   var params = {
     TableName: "user",
-    IndexName: "Email",
-    KeyConditionExpression: "Email = :email",
+    IndexName: "Username",
+    KeyConditionExpression: "Username = :username",
     ExpressionAttributeValues: {
-      ":email": { S: email }
+      ":username": { S: username }
     }
   };
 
@@ -18,7 +18,11 @@ export function isAccountEmailTaken(
     ddb.query(params, (err, data) => {
       if (err) {
         console.error(
-          new Error(`Error getting user from username: ${JSON.stringify(err)}`)
+          new Error(
+            `Error determining whether username is taken: ${JSON.stringify(
+              err
+            )}`
+          )
         );
         reject(err);
       } else if (data && data.Items && data.Items.length > 0) {

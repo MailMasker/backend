@@ -1,4 +1,5 @@
 import { DALContext } from "./DALContext";
+import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 
 export async function createVerifiedEmail(
@@ -13,6 +14,7 @@ export async function createVerifiedEmail(
 ) {
   const id = uuid();
   const verified = false;
+  const emailHash = bcrypt.hashSync(email, 10);
 
   //   return new Promise<>((resolve, reject) => {
   //     dalContext.ddb.putItem(params, function(err, data) {
@@ -44,6 +46,7 @@ export async function createVerifiedEmail(
             Item: {
               ID: { S: id },
               Email: { S: email },
+              EmailHash: { S: emailHash },
               Verified: { BOOL: verified },
               OwnerUserID: { S: userID }
             }
@@ -66,6 +69,9 @@ export async function createVerifiedEmail(
 
   console.debug("result", result);
 
+  console.log(
+    `Successfully created verified emailHash ${emailHash} / ${id} with userID ${userID}`
+  );
   console.debug(
     `Successfully created verified email ${email} / ${id} with userID ${userID}`
   );

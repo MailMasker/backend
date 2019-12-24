@@ -1,7 +1,7 @@
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-core";
 import { createUser as dalCreateUser } from "../../dal/createUser";
-import { isAccountEmailTaken } from "../../dal/isAccountEmailTaken";
+import { isUsernameTaken } from "../../dal/isUsernameTaken";
 
 export const createUser = async (
   parent,
@@ -9,8 +9,8 @@ export const createUser = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  if (await isAccountEmailTaken(dalContext, { email: args.email })) {
-    throw new UserInputError("User with email already exists");
+  if (await isUsernameTaken(dalContext, { username: args.username })) {
+    throw new UserInputError("User with username already exists");
   }
 
   // TODO: someday handle UDID duplicates, but need to check for password match (maybe just call authenticate() ?)
@@ -23,14 +23,14 @@ export const createUser = async (
   //     const { authToken, expires } = await createAuthToken(dalContext, user.id);
   //     return { userID: user.id };
   //   }
-  //   throw new UserInputError("User with email already exists");
+  //   throw new UserInputError("User with username already exists");
   // }
 
   const {
-    user: { id: userID, email },
+    user: { id: userID, username },
     auth: { authToken, expires }
   } = await dalCreateUser(dalContext, {
-    email: args.email,
+    username: args.username,
     password: args.password,
     requestUUID: args.uuid
   });

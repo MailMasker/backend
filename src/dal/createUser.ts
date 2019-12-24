@@ -8,13 +8,13 @@ import { v4 as uuid } from "uuid";
 export function createUser(
   ctx: DALContext,
   userData: {
-    email: string;
+    username: string;
     password: string;
     requestUUID: string;
   }
 ) {
   const userID = uuid();
-  const emailHash = bcrypt.hashSync(userData.email, 10);
+  const usernameHash = bcrypt.hashSync(userData.username, 10);
   const passwordHash = bcrypt.hashSync(userData.password, 10);
 
   const params = {
@@ -22,18 +22,18 @@ export function createUser(
     Item: {
       ID: { S: userID },
       PasswordHash: { S: passwordHash },
-      Email: { S: userData.email },
-      EmailHash: { S: emailHash },
+      Username: { S: userData.username },
+      UsernameHash: { S: usernameHash },
       UUID: { S: userData.requestUUID },
       Created: { N: String(new Date().getTime()) },
-      VerifiedEmailIDs: { L: [] }
+      VerifiedUsernameIDs: { L: [] }
     }
   };
 
   return new Promise<{
     user: {
       id: string;
-      email: string;
+      username: string;
     };
     auth: { authToken: string; expires: number };
   }>((resolve, reject) => {
@@ -44,14 +44,17 @@ export function createUser(
       } else {
         console.info(`Successfully created user with userID ${userID}`);
 
-        const token = jwt.sign({ email: userData.email, userID }, JWT_SECRET);
+        const token = jwt.sign(
+          { username: userData.username, userID },
+          JWT_SECRET
+        );
 
         createAuthToken(ctx, token, userID)
           .then(({ authToken, expires }) => {
             resolve({
               user: {
                 id: userID,
-                email: userData.email
+                username: userData.username
               },
               auth: { authToken, expires }
             });
