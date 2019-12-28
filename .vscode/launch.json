@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Serverless Offline",
+      "name": "Serverless Offline",
       "program": "${workspaceRoot}/node_modules/serverless/bin/serverless",
       "args": [
         "offline",
@@ -30,6 +30,19 @@
       "windows": {
         "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "DynamoDB Local",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dynamo-local"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Start Local Development",
+      "configurations": ["Serverless Offline", "DynamoDB Local"]
     }
   ]
 }
