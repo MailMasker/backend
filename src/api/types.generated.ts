@@ -10,14 +10,9 @@ export type Scalars = {
   Float: number,
 };
 
-export type CreateRouteInput = {
-  redirectToVerifiedEmailID: Scalars['ID'],
-  emailMask: Scalars['ID'],
-};
-
-export type CreateRoutePayload = {
-   __typename?: 'CreateRoutePayload',
-  route?: Maybe<Route>,
+export type CreateEmailMaskInput = {
+  /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
+  raw: Scalars['String'],
 };
 
 export type CreateUserPayload = {
@@ -35,6 +30,11 @@ export type DeleteRoutePayload = {
   errorMessage?: Maybe<Scalars['String']>,
 };
 
+/** 
+ * type CreateRoutePayload {
+ *   route: Route
+ * }
+ **/
 export type DeleteUserPayload = {
    __typename?: 'DeleteUserPayload',
   authToken?: Maybe<Scalars['String']>,
@@ -70,6 +70,7 @@ export type Mutation = {
   createUser: CreateUserPayload,
   /** returns the ID of the VerifiedEmail object */
   createVerifiedEmail: VerifiedEmail,
+  createEmailMask: EmailMask,
 };
 
 
@@ -95,25 +96,15 @@ export type MutationCreateVerifiedEmailArgs = {
   email: Scalars['String']
 };
 
+
+export type MutationCreateEmailMaskArgs = {
+  input: CreateEmailMaskInput
+};
+
 export type Query = {
    __typename?: 'Query',
   me: Me,
   ping: Scalars['String'],
-};
-
-/** 
- * A Route can not be hard deleted, but the email address in
- * redirectToVerifiedEmailID property can be cleared at a user's request
- **/
-export type Route = {
-   __typename?: 'Route',
-  id: Scalars['ID'],
-  /** If deleted is true, then forwardTo will contain a random string */
-  redirectToVerifiedEmailID: Scalars['ID'],
-  inboundTo: EmailMask,
-  expires?: Maybe<Scalars['Int']>,
-  disabled: Scalars['Boolean'],
-  deleted: Scalars['Boolean'],
 };
 
 export type UpdateRouteInput = {
@@ -231,15 +222,13 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   Mutation: ResolverTypeWrapper<{}>,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
-  CreateRouteInput: CreateRouteInput,
-  Route: ResolverTypeWrapper<Route>,
+  CreateEmailMaskInput: CreateEmailMaskInput,
   EmailMask: ResolverTypeWrapper<EmailMask>,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
-  CreateRoutePayload: ResolverTypeWrapper<CreateRoutePayload>,
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>,
   DeleteRouteInput: DeleteRouteInput,
   DeleteRoutePayload: ResolverTypeWrapper<DeleteRoutePayload>,
   UpdateRouteInput: UpdateRouteInput,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
   UpdateRoutePayload: ResolverTypeWrapper<UpdateRoutePayload>,
 }>;
 
@@ -254,20 +243,14 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean'],
   Mutation: {},
   CreateUserPayload: CreateUserPayload,
-  CreateRouteInput: CreateRouteInput,
-  Route: Route,
+  CreateEmailMaskInput: CreateEmailMaskInput,
   EmailMask: EmailMask,
-  Int: Scalars['Int'],
-  CreateRoutePayload: CreateRoutePayload,
   DeleteUserPayload: DeleteUserPayload,
   DeleteRouteInput: DeleteRouteInput,
   DeleteRoutePayload: DeleteRoutePayload,
   UpdateRouteInput: UpdateRouteInput,
+  Int: Scalars['Int'],
   UpdateRoutePayload: UpdateRoutePayload,
-}>;
-
-export type CreateRoutePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateRoutePayload'] = ResolversParentTypes['CreateRoutePayload']> = ResolversObject<{
-  route?: Resolver<Maybe<ResolversTypes['Route']>, ParentType, ContextType>,
 }>;
 
 export type CreateUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateUserPayload'] = ResolversParentTypes['CreateUserPayload']> = ResolversObject<{
@@ -300,20 +283,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   unauthenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, MutationUnauthenticateArgs>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid'>>,
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
+  createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'input'>>,
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-}>;
-
-export type RouteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Route'] = ResolversParentTypes['Route']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  redirectToVerifiedEmailID?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  inboundTo?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType>,
-  expires?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
-  deleted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
 }>;
 
 export type UpdateRoutePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateRoutePayload'] = ResolversParentTypes['UpdateRoutePayload']> = ResolversObject<{
@@ -334,7 +309,6 @@ export type VerifiedEmailResolvers<ContextType = any, ParentType extends Resolve
 }>;
 
 export type Resolvers<ContextType = any> = ResolversObject<{
-  CreateRoutePayload?: CreateRoutePayloadResolvers<ContextType>,
   CreateUserPayload?: CreateUserPayloadResolvers<ContextType>,
   DeleteRoutePayload?: DeleteRoutePayloadResolvers<ContextType>,
   DeleteUserPayload?: DeleteUserPayloadResolvers<ContextType>,
@@ -342,7 +316,6 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Me?: MeResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
   Query?: QueryResolvers<ContextType>,
-  Route?: RouteResolvers<ContextType>,
   UpdateRoutePayload?: UpdateRoutePayloadResolvers<ContextType>,
   User?: UserResolvers<ContextType>,
   VerifiedEmail?: VerifiedEmailResolvers<ContextType>,
