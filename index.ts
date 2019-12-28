@@ -18,6 +18,7 @@ import { authenticated } from "./src/api/lib/authenticated";
 import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { raw as ddb } from "serverless-dynamodb-client";
@@ -31,8 +32,6 @@ import { user } from "./src/api/objects/user";
 
 // TODO: Follow https://serverless.com/blog/aws-secrets-management/ to store secrets in production
 export const JWT_SECRET = "W2UBYMsADD$ZDfrXJMnvHcWm";
-
-const OneYear = 60 * 60 * 24 * 365;
 
 aws.config.update({ region: "us-east-1" });
 
@@ -53,9 +52,9 @@ const mutationResolvers: MutationResolvers = {
 
   createUser,
 
-  createVerifiedEmail
+  createVerifiedEmail,
 
-  // createRoute
+  createRoute
 };
 
 const schema = fs.readFileSync(

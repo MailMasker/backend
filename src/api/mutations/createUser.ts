@@ -1,15 +1,16 @@
+import * as dal from "../../dal/";
+
+import { MutationResolvers } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-core";
-import { createUser as dalCreateUser } from "../../dal/createUser";
-import { isUsernameTaken } from "../../dal/isUsernameTaken";
 
-export const createUser = async (
+export const createUser: MutationResolvers["createUser"] = async (
   parent,
   args,
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
-  if (await isUsernameTaken(dalContext, { username: args.username })) {
+  if (await dal.isUsernameTaken(dalContext, { username: args.username })) {
     throw new UserInputError("User with username already exists");
   }
 
@@ -29,7 +30,7 @@ export const createUser = async (
   const {
     user: { id: userID, username },
     auth: { authToken, expires }
-  } = await dalCreateUser(dalContext, {
+  } = await dal.createUser(dalContext, {
     username: args.username,
     password: args.password,
     requestUUID: args.uuid

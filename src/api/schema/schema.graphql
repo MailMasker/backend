@@ -2,25 +2,29 @@ type CreateUserPayload {
   userID: ID!
 }
 
-input CreateRouteInput {
-  redirectToVerifiedEmailID: ID!
-  emailMask: ID!
+# input CreateRouteInput {
+#   redirectToVerifiedEmailID: ID!
+#   emailMask: CreateEmailMaskInput!
+# }
+
+input CreateEmailMaskInput {
+  # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
+  raw: String!
 }
 
-# A Route can not be hard deleted, but the email address in redirectToVerifiedEmailID property can be cleared at a user's request
-type Route {
-  id: ID!
-  # If deleted is true, then forwardTo will contain a random string
-  redirectToVerifiedEmailID: ID!
-  inboundTo: EmailMask!
-  expires: Int
-  disabled: Boolean!
-  deleted: Boolean!
-}
+# A Route can not be hard deleted, but the email address in redirectToVerifiedEmail can be cleared at a user's request
+# type Route {
+#   id: ID!
+#   redirectToVerifiedEmail: VerifiedEmail!
+#   inboundTo: EmailMask!
+#   expires: Int
+#   disabled: Boolean!
+#   deleted: Boolean!
+# }
 
-type CreateRoutePayload {
-  route: Route
-}
+# type CreateRoutePayload {
+#   route: Route
+# }
 type DeleteUserPayload {
   authToken: String
 }
@@ -99,6 +103,10 @@ type Mutation {
 
   # returns the ID of the VerifiedEmail object
   createVerifiedEmail(email: String!): VerifiedEmail!
+
+  createEmailMask(input: CreateEmailMaskInput!): EmailMask!
+  # deleteEmailMask(input: DeleteEmailMaskInput!): String!
+  # updateEmailMask(input: UpdateEmailMaskInput!): EmailMask!
 
   # createRoute(input: CreateRouteInput!): CreateRoutePayload!
   # deleteRoute(input: DeleteRouteInput!): DeleteRoutePayload!
