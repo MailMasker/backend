@@ -53,8 +53,6 @@ export type EmailMask = {
   base: Scalars['String'],
   /** For x+y@1nt.email, "1nt.email" is the domain */
   domain: Scalars['String'],
-  /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
-  raw: Scalars['String'],
 };
 
 export type Me = {
@@ -271,7 +269,6 @@ export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversPa
   ownerUserID?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   base?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  raw?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
 export type MeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me']> = ResolversObject<{

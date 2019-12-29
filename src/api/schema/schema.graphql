@@ -60,8 +60,6 @@ type EmailMask {
   base: String!
   # For x+y@1nt.email, "1nt.email" is the domain
   domain: String!
-  # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
-  raw: String!
 }
 
 # A User can't be deleted, but its username can be cleared at a user's request

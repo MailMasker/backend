@@ -52,9 +52,9 @@ const mutationResolvers: MutationResolvers = {
 
   createUser,
 
-  createVerifiedEmail,
+  createVerifiedEmail
 
-  createRoute
+  // createRoute
 };
 
 const schema = fs.readFileSync(
