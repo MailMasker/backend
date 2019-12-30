@@ -20,7 +20,7 @@ export const createEmailMask: MutationResolvers["createEmailMask"] = async (
   const baseWithDomain = `${base}@${domain}`;
 
   if (await dal.isEmailMaskTaken(dalContext, { baseWithDomain })) {
-    throw new UserInputError("User with username already exists");
+    throw new UserInputError("That email is already in use");
   }
 
   const {
