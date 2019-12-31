@@ -18,6 +18,7 @@ import { authenticated } from "./src/api/lib/authenticated";
 import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
@@ -54,7 +55,9 @@ const mutationResolvers: MutationResolvers = {
 
   createVerifiedEmail,
 
-  createRoute
+  createEmailMask
+
+  // createRoute
 };
 
 const schema = fs.readFileSync(

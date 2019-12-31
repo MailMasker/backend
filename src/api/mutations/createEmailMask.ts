@@ -1,11 +1,8 @@
 import * as dal from "../../dal/";
 
-import {
-  AuthenticatedResolverContext,
-  ResolverContext
-} from "../lib/ResolverContext";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
+import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { MutationResolvers } from "../types.generated";
 import { deconstructEmail } from "../../lib/deconstructEmail";
 
@@ -16,20 +13,22 @@ export const createEmailMask: MutationResolvers["createEmailMask"] = async (
   info
 ) => {
   if (!currentUserID) {
-    return new AuthenticationError("authentication required");
-  }
-  if (await dal.isUsernameTaken(dalContext, { username: args.username })) {
-    throw new UserInputError("User with username already exists");
+    throw new AuthenticationError("authentication required");
   }
 
   const { base, domain } = deconstructEmail({ email: raw });
+  const baseWithDomain = `${base}@${domain}`;
+
+  if (await dal.isEmailMaskTaken(dalContext, { baseWithDomain })) {
+    throw new UserInputError("That email is already in use");
+  }
 
   const {
-    emailMask: { id, baseWithDomain, ownerUserID }
+    emailMask: { id }
   } = await dal.createEmailMask(dalContext, {
     userID: currentUserID,
     baseWithDomain
   });
 
-  return {};
+  return { id, base, domain, ownerUserID: currentUserID };
 };
