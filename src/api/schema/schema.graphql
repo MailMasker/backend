@@ -54,8 +54,6 @@ type UpdateRoutePayload {
 # An EmailMask cannot be deleted, but a Route.forwardTo can be deleted because it's important for users' data rights.
 type EmailMask {
   id: ID!
-  # OwnerUserID could belong to a deleted user
-  ownerUserID: ID!
   # For x+y@1nt.email, "x" is the base
   base: String!
   # For x+y@1nt.email, "1nt.email" is the domain
@@ -67,7 +65,7 @@ type User {
   id: ID!
   username: String
   # routes: [Route!]!
-  # emailMasks: [EmailMask!]!
+  emailMasks: [EmailMask!]!
   verifiedEmails: [VerifiedEmail!]!
 }
 

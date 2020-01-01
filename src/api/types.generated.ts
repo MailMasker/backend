@@ -47,8 +47,6 @@ export type DeleteUserPayload = {
 export type EmailMask = {
    __typename?: 'EmailMask',
   id: Scalars['ID'],
-  /** OwnerUserID could belong to a deleted user */
-  ownerUserID: Scalars['ID'],
   /** For x+y@1nt.email, "x" is the base */
   base: Scalars['String'],
   /** For x+y@1nt.email, "1nt.email" is the domain */
@@ -123,10 +121,8 @@ export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
   username?: Maybe<Scalars['String']>,
-  /** 
- * routes: [Route!]!
-   * emailMasks: [EmailMask!]!
- **/
+  /** routes: [Route!]! */
+  emailMasks: Array<EmailMask>,
   verifiedEmails: Array<VerifiedEmail>,
 };
 
@@ -216,12 +212,12 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>,
   ID: ResolverTypeWrapper<Scalars['ID']>,
   String: ResolverTypeWrapper<Scalars['String']>,
+  EmailMask: ResolverTypeWrapper<EmailMask>,
   VerifiedEmail: ResolverTypeWrapper<VerifiedEmail>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   Mutation: ResolverTypeWrapper<{}>,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
   CreateEmailMaskInput: CreateEmailMaskInput,
-  EmailMask: ResolverTypeWrapper<EmailMask>,
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>,
   DeleteRouteInput: DeleteRouteInput,
   DeleteRoutePayload: ResolverTypeWrapper<DeleteRoutePayload>,
@@ -237,12 +233,12 @@ export type ResolversParentTypes = ResolversObject<{
   User: User,
   ID: Scalars['ID'],
   String: Scalars['String'],
+  EmailMask: EmailMask,
   VerifiedEmail: VerifiedEmail,
   Boolean: Scalars['Boolean'],
   Mutation: {},
   CreateUserPayload: CreateUserPayload,
   CreateEmailMaskInput: CreateEmailMaskInput,
-  EmailMask: EmailMask,
   DeleteUserPayload: DeleteUserPayload,
   DeleteRouteInput: DeleteRouteInput,
   DeleteRoutePayload: DeleteRoutePayload,
@@ -266,7 +262,6 @@ export type DeleteUserPayloadResolvers<ContextType = any, ParentType extends Res
 
 export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversParentTypes['EmailMask'] = ResolversParentTypes['EmailMask']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  ownerUserID?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   base?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
@@ -296,6 +291,7 @@ export type UpdateRoutePayloadResolvers<ContextType = any, ParentType extends Re
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  emailMasks?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
   verifiedEmails?: Resolver<Array<ResolversTypes['VerifiedEmail']>, ParentType, ContextType>,
 }>;
 

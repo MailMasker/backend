@@ -1,4 +1,4 @@
-import * as dal from "../../dal/verifiedEmailByID";
+import * as dal from "../../dal/";
 
 import {
   Resolver,
@@ -22,7 +22,7 @@ export const user: ResolversTypes["user"] = async (
   if (!currentUserID) {
     throw new AuthenticationError("Authentication required");
   }
-  const { id, username, verifiedEmailIDs } = await userForID(
+  const { id, username, verifiedEmailIDs, emailMaskIDs } = await userForID(
     dalContext,
     currentUserID
   );
@@ -33,6 +33,8 @@ export const user: ResolversTypes["user"] = async (
     verifiedEmails: () =>
       Promise.all(
         verifiedEmailIDs.map(id => dal.verifiedEmailByID(dalContext, id))
-      )
+      ),
+    emailMasks: () =>
+      Promise.all(emailMaskIDs.map(id => dal.emailMaskByID(dalContext, id)))
   };
 };
