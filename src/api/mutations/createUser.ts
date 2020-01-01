@@ -14,7 +14,7 @@ export const createUser: MutationResolvers["createUser"] = async (
     throw new UserInputError("User with username already exists");
   }
 
-  // TODO: someday handle UDID duplicates, but need to check for password match (maybe just call authenticate() ?)
+  // TODO: someday handle duplicate requests via UUID, but need to check for password match (maybe just call authenticate() ?)
   //
   // if (user) {
   //   if (user.uuid === args.uuid) {

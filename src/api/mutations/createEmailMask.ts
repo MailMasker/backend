@@ -3,7 +3,6 @@ import * as dal from "../../dal/";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
-import { MutationResolvers } from "../types.generated";
 import { deconstructEmail } from "../../lib/deconstructEmail";
 
 export const createEmailMask = async (
