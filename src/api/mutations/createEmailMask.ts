@@ -6,7 +6,7 @@ import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { MutationResolvers } from "../types.generated";
 import { deconstructEmail } from "../../lib/deconstructEmail";
 
-export const createEmailMask: MutationResolvers["createEmailMask"] = async (
+export const createEmailMask = async (
   parent,
   { input: { raw } },
   { setAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,

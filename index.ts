@@ -4,14 +4,15 @@ import * as aws from "aws-sdk";
 import * as fs from "fs";
 import * as path from "path";
 
+// @ts-ignore
+import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
   ResolverContext
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
+import { TokenNotFoundError, userIDForToken } from "./src/dal/userIDForToken";
 
-// @ts-ignore
-import { ApolloServer } from "apollo-server-express";
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
@@ -53,9 +54,9 @@ const mutationResolvers: MutationResolvers = {
 
   createUser,
 
-  createVerifiedEmail,
+  createVerifiedEmail: combineResolvers(authenticated, createVerifiedEmail),
 
-  createEmailMask
+  createEmailMask: combineResolvers(authenticated, createEmailMask)
 
   // createRoute
 };
@@ -76,6 +77,7 @@ const server = new ApolloServer({
   context: async ({ req, res }) => {
     const authToken = req.cookies.jwt || req.headers.Authorization;
 
+    // We get the "currentUserID" from the token, but we don't check whether the auth token is valid here – that happens separately, and only for authenticated queries and mutations
     let currentUserID: string | undefined;
     if (authToken) {
       // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
@@ -84,14 +86,6 @@ const server = new ApolloServer({
         username: string;
       };
       currentUserID = userID;
-
-      // This is no longer needed due to JWTs
-      //
-      // try {
-      //   userID = await userIDForToken(dalContext, authToken);
-      // } catch (error) {
-      //   console.warn("Error getting userID: ", error);
-      // }
     }
 
     const context: ResolverContext | AuthenticatedResolverContext = {
