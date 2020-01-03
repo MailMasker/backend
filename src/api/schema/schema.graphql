@@ -2,52 +2,32 @@ type CreateUserPayload {
   userID: ID!
 }
 
-# input CreateRouteInput {
-#   redirectToVerifiedEmailID: ID!
-#   emailMask: CreateEmailMaskInput!
-# }
-
 input CreateEmailMaskInput {
   # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
   raw: String!
 }
 
-# A Route can not be hard deleted, but the email address in redirectToVerifiedEmail can be cleared at a user's request
-# type Route {
-#   id: ID!
-#   redirectToVerifiedEmail: VerifiedEmail!
-#   inboundTo: EmailMask!
-#   expires: Int
-#   disabled: Boolean!
-#   deleted: Boolean!
-# }
+input CreateRouteInput {
+  # redirectToVerifiedEmailID represents the email address to which we should redirect/forward
+  redirectToVerifiedEmailID: ID!
+  emailMaskID: ID!
+}
 
-# type CreateRoutePayload {
-#   route: Route
-# }
+# A Route can not be hard deleted, but the email address in redirectToVerifiedEmail can be cleared at a user's request
+type Route {
+  id: ID!
+  redirectToVerifiedEmail: VerifiedEmail!
+  emailMask: EmailMask!
+  expires: Int
+  disabled: Boolean!
+}
+
+type CreateRoutePayload {
+  route: Route!
+}
+
 type DeleteUserPayload {
   authToken: String
-}
-
-input DeleteRouteInput {
-  id: ID!
-}
-
-type DeleteRoutePayload {
-  success: Boolean!
-  errorMessage: String
-}
-
-input UpdateRouteInput {
-  id: ID!
-  forwardTo: String
-  inboundToEmailMaskID: ID!
-  expires: Int
-}
-
-type UpdateRoutePayload {
-  success: Boolean!
-  errorMessage: String
 }
 
 # Once created, an EmailMask is reserved forever so that it cannot be used by another user
@@ -97,14 +77,9 @@ type Mutation {
     uuid: String!
   ): CreateUserPayload!
 
-  # returns the ID of the VerifiedEmail object
   createVerifiedEmail(email: String!): VerifiedEmail!
 
   createEmailMask(input: CreateEmailMaskInput!): EmailMask!
-  # deleteEmailMask(input: DeleteEmailMaskInput!): String!
-  # updateEmailMask(input: UpdateEmailMaskInput!): EmailMask!
 
-  # createRoute(input: CreateRouteInput!): CreateRoutePayload!
-  # deleteRoute(input: DeleteRouteInput!): DeleteRoutePayload!
-  # updateRoute(input: UpdateRouteInput!): UpdateRoutePayload!
+  createRoute(input: CreateRouteInput!): CreateRoutePayload!
 }
