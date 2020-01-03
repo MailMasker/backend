@@ -4,11 +4,15 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "allowJs": true,
-    "target": "es5",
     "outDir": ".build",
     "moduleResolution": "node",
-    "lib": ["es2015"],
     "rootDir": "./",
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "lib": ["es2018"],
+    "module": "commonjs",
+    "target": "es2018",
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
+  },
+  "include": ["./src"]
 }

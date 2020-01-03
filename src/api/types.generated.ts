@@ -119,7 +119,7 @@ export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
   username?: Maybe<Scalars['String']>,
-  /** routes: [Route!]! */
+  routes: Array<Route>,
   emailMasks: Array<EmailMask>,
   verifiedEmails: Array<VerifiedEmail>,
 };
@@ -210,16 +210,16 @@ export type ResolversTypes = ResolversObject<{
   User: ResolverTypeWrapper<User>,
   ID: ResolverTypeWrapper<Scalars['ID']>,
   String: ResolverTypeWrapper<Scalars['String']>,
-  EmailMask: ResolverTypeWrapper<EmailMask>,
+  Route: ResolverTypeWrapper<Route>,
   VerifiedEmail: ResolverTypeWrapper<VerifiedEmail>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
+  EmailMask: ResolverTypeWrapper<EmailMask>,
+  Int: ResolverTypeWrapper<Scalars['Int']>,
   Mutation: ResolverTypeWrapper<{}>,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
   CreateEmailMaskInput: CreateEmailMaskInput,
   CreateRouteInput: CreateRouteInput,
   CreateRoutePayload: ResolverTypeWrapper<CreateRoutePayload>,
-  Route: ResolverTypeWrapper<Route>,
-  Int: ResolverTypeWrapper<Scalars['Int']>,
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>,
 }>;
 
@@ -230,16 +230,16 @@ export type ResolversParentTypes = ResolversObject<{
   User: User,
   ID: Scalars['ID'],
   String: Scalars['String'],
-  EmailMask: EmailMask,
+  Route: Route,
   VerifiedEmail: VerifiedEmail,
   Boolean: Scalars['Boolean'],
+  EmailMask: EmailMask,
+  Int: Scalars['Int'],
   Mutation: {},
   CreateUserPayload: CreateUserPayload,
   CreateEmailMaskInput: CreateEmailMaskInput,
   CreateRouteInput: CreateRouteInput,
   CreateRoutePayload: CreateRoutePayload,
-  Route: Route,
-  Int: Scalars['Int'],
   DeleteUserPayload: DeleteUserPayload,
 }>;
 
@@ -290,6 +290,7 @@ export type RouteResolvers<ContextType = any, ParentType extends ResolversParent
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  routes?: Resolver<Array<ResolversTypes['Route']>, ParentType, ContextType>,
   emailMasks?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
   verifiedEmails?: Resolver<Array<ResolversTypes['VerifiedEmail']>, ParentType, ContextType>,
 }>;

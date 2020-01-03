@@ -1,12 +1,9 @@
-import {
-  TokenExpiredError,
-  TokenNotFoundError,
-  userIDForToken
-} from "../../dal/userIDForToken";
+import { TokenExpiredError, userIDForToken } from "../../dal/userIDForToken";
 
 import { AuthenticatedResolverContext } from "./ResolverContext";
 import { AuthenticationError } from "apollo-server-express";
-import { userForID } from "../../dal/userForID";
+import { NotFoundError } from "../../dal";
+import { userByID } from "../../dal/userByID";
 
 export async function ensureAuthenticated({
   dalContext,
@@ -31,7 +28,7 @@ export async function ensureAuthenticated({
       throw new AuthenticationError("Authentication required");
     }
   } catch (error) {
-    if (error.name === TokenNotFoundError) {
+    if (error instanceof NotFoundError) {
       throw new AuthenticationError("Authentication required");
     } else if (error.name === TokenExpiredError) {
       throw new AuthenticationError(
@@ -41,7 +38,7 @@ export async function ensureAuthenticated({
     throw error;
   }
 
-  const currentUser = await userForID(dalContext, currentUserID);
+  const currentUser = await userByID(dalContext, currentUserID);
 
   return { currentUser };
 }

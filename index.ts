@@ -11,7 +11,6 @@ import {
   ResolverContext
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
-import { TokenNotFoundError, userIDForToken } from "./src/dal/userIDForToken";
 
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
@@ -31,6 +30,7 @@ import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
+import { userIDForToken } from "./src/dal/userIDForToken";
 
 // TODO: Follow https://serverless.com/blog/aws-secrets-management/ to store secrets in production
 export const JWT_SECRET = "W2UBYMsADD$ZDfrXJMnvHcWm";

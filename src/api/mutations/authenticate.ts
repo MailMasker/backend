@@ -6,7 +6,7 @@ import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcrypt";
 import { createAuthToken } from "../../dal/createAuthToken";
 import jwt from "jsonwebtoken";
-import { userForUsername } from "../../dal/userForEmail";
+import { userByUsername } from "../../dal/userByUsername";
 
 // TODO: implement rate limiting
 
@@ -18,7 +18,7 @@ export const authenticate = async (
 ) => {
   try {
     console.debug("getting user for username: ", args.username);
-    const user = await userForUsername(dalContext, { username: args.username });
+    const user = await userByUsername(dalContext, { username: args.username });
 
     console.debug("userfound: ", user);
 

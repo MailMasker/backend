@@ -1,7 +1,9 @@
 import * as dal from "../../dal/";
 
+import { ForbiddenError, UserInputError } from "apollo-server-express";
+
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
-import { ForbiddenError } from "apollo-server-express";
+import { EmailMaskInUseInRouteError } from "../../dal/createRoute";
 import { MutationResolvers } from "../types.generated";
 import { ensureAuthenticated } from "../lib/ensureAuthenticated";
 
@@ -35,14 +37,22 @@ export const createRoute: MutationResolvers["createRoute"] = async (
     );
   }
 
-  const { route } = await dal.createRoute(
-    { ddb: context.dalContext.ddb },
-    {
-      redirectToVerifiedEmailID: args.input.redirectToVerifiedEmailID,
-      ownerUserID: currentUser.id,
-      emailMaskID: args.input.emailMaskID
+  try {
+    const { route } = await dal.createRoute(
+      { ddb: context.dalContext.ddb },
+      {
+        redirectToVerifiedEmailID: args.input.redirectToVerifiedEmailID,
+        ownerUserID: currentUser.id,
+        emailMaskID: args.input.emailMaskID
+      }
+    );
+    return { routeID: route.id };
+  } catch (err) {
+    if (err instanceof EmailMaskInUseInRouteError) {
+      throw new UserInputError(
+        "The email mask you've chosen is already being used in another route"
+      );
     }
-  );
-
-  return { routeID: route.id };
+    throw err;
+  }
 };

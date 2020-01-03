@@ -3,7 +3,7 @@ import * as dal from "../../dal/createVerifiedEmail";
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
-import { verifiedEmailForEmail } from "../../dal/verifiedEmailForEmail";
+import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
 export const createVerifiedEmail = async (
   parent,
@@ -14,7 +14,7 @@ export const createVerifiedEmail = async (
   if (!currentUserID) {
     throw new AuthenticationError("Must be signed in");
   }
-  const existingVerifiedEmail = await verifiedEmailForEmail(dalContext, {
+  const existingVerifiedEmail = await verifiedEmailByEmail(dalContext, {
     email: args.email
   });
   if (existingVerifiedEmail) {

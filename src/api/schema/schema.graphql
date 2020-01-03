@@ -44,7 +44,7 @@ type EmailMask {
 type User {
   id: ID!
   username: String
-  # routes: [Route!]!
+  routes: [Route!]!
   emailMasks: [EmailMask!]!
   verifiedEmails: [VerifiedEmail!]!
 }
