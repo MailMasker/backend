@@ -23,7 +23,7 @@ type Route {
 }
 
 type CreateRoutePayload {
-  route: Route!
+  routeID: ID!
 }
 
 type DeleteUserPayload {

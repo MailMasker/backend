@@ -81,14 +81,26 @@ resources:
       Properties:
         TableName: route
         AttributeDefinitions:
-          - AttributeName: To
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: EmailMaskID
             AttributeType: S
         KeySchema:
-          - AttributeName: To
+          - AttributeName: ID
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: EmailMaskID
+            KeySchema:
+              - AttributeName: EmailMaskID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
     verified-email:
       Type: AWS::DynamoDB::Table
       Properties:

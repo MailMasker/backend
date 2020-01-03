@@ -56,9 +56,9 @@ const mutationResolvers: MutationResolvers = {
 
   createVerifiedEmail: combineResolvers(authenticated, createVerifiedEmail),
 
-  createEmailMask: combineResolvers(authenticated, createEmailMask)
+  createEmailMask: combineResolvers(authenticated, createEmailMask),
 
-  // createRoute
+  createRoute
 };
 
 const schema = fs.readFileSync(

@@ -23,7 +23,7 @@ export type CreateRouteInput = {
 
 export type CreateRoutePayload = {
    __typename?: 'CreateRoutePayload',
-  route: Route,
+  routeID: Scalars['ID'],
 };
 
 export type CreateUserPayload = {
@@ -244,7 +244,7 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type CreateRoutePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateRoutePayload'] = ResolversParentTypes['CreateRoutePayload']> = ResolversObject<{
-  route?: Resolver<ResolversTypes['Route'], ParentType, ContextType>,
+  routeID?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
 }>;
 
 export type CreateUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateUserPayload'] = ResolversParentTypes['CreateUserPayload']> = ResolversObject<{
