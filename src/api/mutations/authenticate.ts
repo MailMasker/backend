@@ -1,5 +1,4 @@
 import { ApolloError } from "apollo-server-core";
-import { JWT_SECRET } from "../../..";
 import { MutationAuthenticateArgs } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-express";
@@ -29,8 +28,8 @@ export const authenticate = async (
     console.debug("password matches");
 
     const authToken = jwt.sign(
-      { username: user.username, userID: user.id },
-      JWT_SECRET
+      { username: user.username, userID: user.id },,
+      process.env.JWT_SECRET as string
     );
 
     console.debug("authtoken during authenticate: ", authToken);

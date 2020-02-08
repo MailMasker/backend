@@ -19,7 +19,6 @@ import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createEmailMask } from "./src/api/mutations/createEmailMask";
-import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { raw as ddb } from "serverless-dynamodb-client";
@@ -31,9 +30,6 @@ import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
 import { userIDForToken } from "./src/dal/userIDForToken";
-
-// TODO: Follow https://serverless.com/blog/aws-secrets-management/ to store secrets in production
-export const JWT_SECRET = "W2UBYMsADD$ZDfrXJMnvHcWm";
 
 aws.config.update({ region: "us-east-1" });
 
@@ -77,11 +73,19 @@ const server = new ApolloServer({
   context: async ({ req, res }) => {
     const authToken = req.cookies.jwt || req.headers.Authorization;
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error("process.env.JWT_SECRET empty");
+    }
+
     // We get the "currentUserID" from the token, but we don't check whether the auth token is valid here – that happens separately, and only for authenticated queries and mutations
+
     let currentUserID: string | undefined;
     if (authToken) {
       // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
-      const { userID, username } = jwt.verify(authToken, JWT_SECRET) as {
+      const { userID, username } = jwt.verify(
+        authToken,
+        process.env.JWT_SECRET as string
+      ) as {
         userID: string;
         username: string;
       };
