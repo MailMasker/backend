@@ -2,7 +2,7 @@ service: email-forwarder-api
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   region: us-east-1
 
 plugins:
@@ -101,7 +101,7 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    verified-email:
+    verifiedemail:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: verified-email
@@ -126,7 +126,7 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    email-mask:
+    emailmask:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: email-mask
