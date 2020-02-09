@@ -41,7 +41,7 @@ functions:
 
 resources:
   Resources:
-    auth:
+    authTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: auth
@@ -54,7 +54,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    user:
+    userTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: user
@@ -79,7 +79,7 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    route:
+    routeTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: route
@@ -104,7 +104,7 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    verifiedemail:
+    verifiedEmailTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: verified-email
@@ -129,7 +129,7 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-    emailmask:
+    emailMaskTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: email-mask
