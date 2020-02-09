@@ -10,4 +10,4 @@ jspm_packages
 # My commands
 deploy-dev.sh
 
-.env
+jwt_secret.txt

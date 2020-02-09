@@ -7,10 +7,11 @@ provider:
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-offline
   - serverless-dynamodb-local
+  - serverless-offline
 
 custom:
+  JWT_SECRET: ${file(jwt_secret.txt)}
   dynamodb:
     stages:
       - dev
@@ -29,6 +30,8 @@ functions:
           path: graphql
           method: post
           cors: true
+    environment:
+      JWT_SECRET: ${self:custom.JWT_SECRET}
   playground:
     handler: index.handler
     events:
