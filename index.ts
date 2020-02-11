@@ -19,6 +19,7 @@ import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { createEmailMask } from "./src/api/mutations/createEmailMask";
+import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { raw as ddb } from "serverless-dynamodb-client";
@@ -52,9 +53,9 @@ const mutationResolvers: MutationResolvers = {
 
   createVerifiedEmail: combineResolvers(authenticated, createVerifiedEmail),
 
-  createEmailMask: combineResolvers(authenticated, createEmailMask)
+  createEmailMask: combineResolvers(authenticated, createEmailMask),
 
-  // createRoute
+  createRoute
 };
 
 const schema = fs.readFileSync(

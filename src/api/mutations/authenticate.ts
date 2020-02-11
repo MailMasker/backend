@@ -2,7 +2,7 @@ import { ApolloError } from "apollo-server-core";
 import { MutationAuthenticateArgs } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { createAuthToken } from "../../dal/createAuthToken";
 import jwt from "jsonwebtoken";
 import { userByUsername } from "../../dal/userByUsername";
@@ -28,7 +28,7 @@ export const authenticate = async (
     console.debug("password matches");
 
     const authToken = jwt.sign(
-      { username: user.username, userID: user.id },,
+      { username: user.username, userID: user.id },
       process.env.JWT_SECRET as string
     );
 
