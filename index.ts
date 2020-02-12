@@ -127,7 +127,7 @@ app.use(cors(corsOptions));
 
 server.applyMiddleware({ app });
 
-app.get("/playground", graphiql({ endpoint: "/graphql" }));
+app.get("/playground", graphiql({ endpoint: "/dev/graphql" }));
 
 const handler = serverless(app);
 

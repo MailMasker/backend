@@ -4,6 +4,30 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: us-east-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
+      Resource: "arn:aws:logs:*:*:*"
+    - Effect: "Allow"
+      Action: "ses:SendRawEmail"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "s3:GetObject"
+        - "s3:PutObject"
+      Resource: "arn:aws:s3:::email-forwarder-inbound-emails/*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:DescribeTable"
+        - "dynamodb:Query"
+        - "dynamodb:Scan"
+        - "dynamodb:PutItem"
+        - "dynamodb:GetItem"
+        - "dynamodb:UpdateItem"
+      Resource: "arn:aws:dynamodb:us-east-1:747558615165:table/*"
 
 plugins:
   - serverless-plugin-typescript
