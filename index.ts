@@ -30,7 +30,6 @@ import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
-import { userIDForToken } from "./src/dal/userIDForToken";
 
 aws.config.update({ region: "us-east-1" });
 
@@ -119,15 +118,23 @@ const app = express();
 
 app.use(cookieParser());
 
-var corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true
-};
-app.use(cors(corsOptions));
-
 server.applyMiddleware({ app });
 
 app.get("/playground", graphiql({ endpoint: "/dev/graphql" }));
+
+let whitelist = ["http://localhost:3000", "http://localhost:3001"];
+app.use(
+  cors({
+    origin: (origin: any, callback: any) => {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true
+  })
+);
 
 const handler = serverless(app);
 
