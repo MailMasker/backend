@@ -122,18 +122,19 @@ server.applyMiddleware({ app });
 
 app.get("/playground", graphiql({ endpoint: "/dev/graphql" }));
 
-let whitelist = ["http://localhost:3000", "http://localhost:3001"];
+// let whitelist = ["http://localhost:3000", "http://localhost:3001"];
 app.use(
-  cors({
-    origin: (origin: any, callback: any) => {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true
-  })
+  cors()
+  // cors({
+  //   origin: (origin: any, callback: any) => {
+  //     if (whitelist.indexOf(origin) !== -1) {
+  //       callback(null, true);
+  //     } else {
+  //       callback(new Error("Not allowed by CORS"));
+  //     }
+  //   },
+  //   credentials: true
+  // })
 );
 
 const handler = serverless(app);
