@@ -116,6 +116,8 @@ const server = new ApolloServer({
 
 const app = express();
 
+app.use(cors());
+
 app.use(cookieParser());
 
 server.applyMiddleware({ app });
@@ -123,19 +125,18 @@ server.applyMiddleware({ app });
 app.get("/playground", graphiql({ endpoint: "/dev/graphql" }));
 
 // let whitelist = ["http://localhost:3000", "http://localhost:3001"];
-app.use(
-  cors()
-  // cors({
-  //   origin: (origin: any, callback: any) => {
-  //     if (whitelist.indexOf(origin) !== -1) {
-  //       callback(null, true);
-  //     } else {
-  //       callback(new Error("Not allowed by CORS"));
-  //     }
-  //   },
-  //   credentials: true
-  // })
-);
+// app.use(
+// cors({
+//   origin: (origin: any, callback: any) => {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true
+// })
+// );
 
 const handler = serverless(app);
 
