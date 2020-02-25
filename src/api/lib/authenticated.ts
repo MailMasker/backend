@@ -9,10 +9,9 @@ export async function authenticated(
   info: any
 ) {
   try {
-    // ensureAuthenticated(context);
+    await ensureAuthenticated(context);
     return skip;
   } catch (err) {
-    console.log("returning error", err);
     return err;
   }
 }
