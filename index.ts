@@ -138,7 +138,7 @@ app.use(cookieParser());
 
 server.applyMiddleware({ app });
 
-app.get("/playground", graphiql({ endpoint: "/dev/graphql" }));
+app.get("/playground", graphiql({ endpoint: "/graphql" }));
 
 const handler = serverless(app);
 

@@ -10,11 +10,6 @@ export type Scalars = {
   Float: number,
 };
 
-export type CreateEmailMaskInput = {
-  /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
-  raw: Scalars['String'],
-};
-
 export type CreateRouteInput = {
   /** redirectToVerifiedEmailID represents the email address to which we should redirect/forward */
   redirectToVerifiedEmailID: Scalars['ID'],
@@ -61,6 +56,7 @@ export type Mutation = {
   unauthenticate?: Maybe<Scalars['Boolean']>,
   createUser: CreateUserPayload,
   createVerifiedEmail: VerifiedEmail,
+  /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
   createEmailMask: EmailMask,
   createRoute: CreateRoutePayload,
 };
@@ -90,7 +86,7 @@ export type MutationCreateVerifiedEmailArgs = {
 
 
 export type MutationCreateEmailMaskArgs = {
-  input: CreateEmailMaskInput
+  raw: Scalars['String']
 };
 
 
@@ -217,7 +213,6 @@ export type ResolversTypes = ResolversObject<{
   Int: ResolverTypeWrapper<Scalars['Int']>,
   Mutation: ResolverTypeWrapper<{}>,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
-  CreateEmailMaskInput: CreateEmailMaskInput,
   CreateRouteInput: CreateRouteInput,
   CreateRoutePayload: ResolverTypeWrapper<CreateRoutePayload>,
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>,
@@ -237,7 +232,6 @@ export type ResolversParentTypes = ResolversObject<{
   Int: Scalars['Int'],
   Mutation: {},
   CreateUserPayload: CreateUserPayload,
-  CreateEmailMaskInput: CreateEmailMaskInput,
   CreateRouteInput: CreateRouteInput,
   CreateRoutePayload: CreateRoutePayload,
   DeleteUserPayload: DeleteUserPayload,
@@ -270,7 +264,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   unauthenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, MutationUnauthenticateArgs>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid'>>,
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
-  createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'input'>>,
+  createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'raw'>>,
   createRoute?: Resolver<ResolversTypes['CreateRoutePayload'], ParentType, ContextType, RequireFields<MutationCreateRouteArgs, 'input'>>,
 }>;
 

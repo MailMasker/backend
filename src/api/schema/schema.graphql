@@ -2,11 +2,6 @@ type CreateUserPayload {
   userID: ID!
 }
 
-input CreateEmailMaskInput {
-  # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
-  raw: String!
-}
-
 input CreateRouteInput {
   # redirectToVerifiedEmailID represents the email address to which we should redirect/forward
   redirectToVerifiedEmailID: ID!
@@ -79,7 +74,8 @@ type Mutation {
 
   createVerifiedEmail(email: String!): VerifiedEmail!
 
-  createEmailMask(input: CreateEmailMaskInput!): EmailMask!
+  # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
+  createEmailMask(raw: String!): EmailMask!
 
   createRoute(input: CreateRouteInput!): CreateRoutePayload!
 }

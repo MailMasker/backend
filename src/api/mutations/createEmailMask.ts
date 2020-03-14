@@ -7,7 +7,7 @@ import { deconstructEmail } from "../../lib/deconstructEmail";
 
 export const createEmailMask = async (
   parent,
-  { input: { raw } },
+  { raw },
   { setAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,
   info
 ) => {
