@@ -16,24 +16,24 @@ export const createRoute: MutationResolvers["createRoute"] = async (
   const { currentUser } = await ensureAuthenticated(context);
 
   // Validate that the Verified Email belongs to this user
-  const { ownerUserID: verifiedEmailOwnerUserID } = await dal.verifiedEmailByID(
+  const verifiedEmail = await dal.verifiedEmailByID(
     context.dalContext,
-    args.input.redirectToVerifiedEmailID
+    args.redirectToVerifiedEmailID
   );
-  if (verifiedEmailOwnerUserID !== currentUser.id) {
+  if (verifiedEmail.ownerUserID !== currentUser.id) {
     throw new ForbiddenError(
-      `the verified email ${args.input.redirectToVerifiedEmailID} belongs to user ${verifiedEmailOwnerUserID}, not ${currentUser.id}`
+      `the verified email ${args.redirectToVerifiedEmailID} belongs to user ${verifiedEmail.ownerUserID}, not ${currentUser.id}`
     );
   }
 
   // Validate that the Email Mask belongs to this user
-  const { ownerUserID: emailMaskOwnerUserID } = await dal.emailMaskByID(
+  const emailMask = await dal.emailMaskByID(
     context.dalContext,
-    args.input.emailMaskID
+    args.emailMaskID
   );
-  if (emailMaskOwnerUserID !== currentUser.id) {
+  if (emailMask.ownerUserID !== currentUser.id) {
     throw new ForbiddenError(
-      `the email mask ${args.input.emailMaskID} belongs to user ${emailMaskOwnerUserID}, not ${currentUser.id}`
+      `the email mask ${args.emailMaskID} belongs to user ${emailMask.ownerUserID}, not ${currentUser.id}`
     );
   }
 
@@ -41,12 +41,19 @@ export const createRoute: MutationResolvers["createRoute"] = async (
     const { route } = await dal.createRoute(
       { ddb: context.dalContext.ddb },
       {
-        redirectToVerifiedEmailID: args.input.redirectToVerifiedEmailID,
+        redirectToVerifiedEmailID: args.redirectToVerifiedEmailID,
         ownerUserID: currentUser.id,
-        emailMaskID: args.input.emailMaskID
+        emailMaskID: args.emailMaskID
       }
     );
-    return { routeID: route.id };
+    // TODO: fill in "expires" and "disable" values once they're supported
+    return {
+      id: route.id,
+      emailMask,
+      expires: 0,
+      disabled: false,
+      redirectToVerifiedEmail: verifiedEmail
+    };
   } catch (err) {
     if (err instanceof EmailMaskInUseInRouteError) {
       throw new UserInputError(

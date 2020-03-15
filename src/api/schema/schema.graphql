@@ -2,12 +2,6 @@ type CreateUserPayload {
   userID: ID!
 }
 
-input CreateRouteInput {
-  # redirectToVerifiedEmailID represents the email address to which we should redirect/forward
-  redirectToVerifiedEmailID: ID!
-  emailMaskID: ID!
-}
-
 # A Route can not be hard deleted, but the email address in redirectToVerifiedEmail can be cleared at a user's request
 type Route {
   id: ID!
@@ -15,10 +9,6 @@ type Route {
   emailMask: EmailMask!
   expires: Int
   disabled: Boolean!
-}
-
-type CreateRoutePayload {
-  routeID: ID!
 }
 
 type DeleteUserPayload {
@@ -77,5 +67,9 @@ type Mutation {
   # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
   createEmailMask(raw: String!): EmailMask!
 
-  createRoute(input: CreateRouteInput!): CreateRoutePayload!
+  createRoute(
+    # redirectToVerifiedEmailID represents the email address to which we should redirect/forward
+    redirectToVerifiedEmailID: ID!
+    emailMaskID: ID!
+  ): Route!
 }

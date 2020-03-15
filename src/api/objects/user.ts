@@ -24,6 +24,8 @@ export const user: ResolversTypes["user"] = async (
     routeIDs
   } = await userByID(dalContext, currentUserID);
 
+  console.debug("list of emailMaskIDs", JSON.stringify(emailMaskIDs));
+
   return {
     id,
     username,
@@ -37,8 +39,11 @@ export const user: ResolversTypes["user"] = async (
       dal.routesByIDs(dalContext, routeIDs).then(routes =>
         routes.map(route => ({
           id: route.id,
-          emailMask: dal.emailMaskByID(dalContext, id),
-          redirectToVerifiedEmail: dal.verifiedEmailByID(dalContext, id),
+          emailMask: dal.emailMaskByID(dalContext, route.emailMaskID),
+          redirectToVerifiedEmail: dal.verifiedEmailByID(
+            dalContext,
+            route.redirectToVerifiedEmailID
+          ),
           disabled: false
         }))
       )
