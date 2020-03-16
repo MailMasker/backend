@@ -30,6 +30,7 @@ import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
+import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
 
 aws.config.update({ region: "us-east-1" });
 
@@ -54,7 +55,9 @@ const mutationResolvers: MutationResolvers = {
 
   createEmailMask: combineResolvers(authenticated, createEmailMask),
 
-  createRoute
+  createRoute: combineResolvers(authenticated, createRoute),
+
+  verifyEmailWithCode: combineResolvers(authenticated, verifyEmailWithCode)
 };
 
 const schema = fs.readFileSync(

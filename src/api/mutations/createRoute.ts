@@ -7,7 +7,7 @@ import { EmailMaskInUseInRouteError } from "../../dal/createRoute";
 import { MutationResolvers } from "../types.generated";
 import { ensureAuthenticated } from "../lib/ensureAuthenticated";
 
-export const createRoute: MutationResolvers["createRoute"] = async (
+export const createRoute = async (
   parent,
   args,
   context: AuthenticatedResolverContext,

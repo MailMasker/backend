@@ -48,6 +48,7 @@ export type Mutation = {
   /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
   createEmailMask: EmailMask,
   createRoute: Route,
+  verifyEmailWithCode: VerifiedEmail,
 };
 
 
@@ -82,6 +83,12 @@ export type MutationCreateEmailMaskArgs = {
 export type MutationCreateRouteArgs = {
   redirectToVerifiedEmailID: Scalars['ID'],
   emailMaskID: Scalars['ID']
+};
+
+
+export type MutationVerifyEmailWithCodeArgs = {
+  email: Scalars['String'],
+  code: Scalars['String']
 };
 
 export type Query = {
@@ -248,6 +255,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
   createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'raw'>>,
   createRoute?: Resolver<ResolversTypes['Route'], ParentType, ContextType, RequireFields<MutationCreateRouteArgs, 'redirectToVerifiedEmailID' | 'emailMaskID'>>,
+  verifyEmailWithCode?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationVerifyEmailWithCodeArgs, 'email' | 'code'>>,
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

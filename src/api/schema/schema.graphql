@@ -72,4 +72,6 @@ type Mutation {
     redirectToVerifiedEmailID: ID!
     emailMaskID: ID!
   ): Route!
+
+  verifyEmailWithCode(email: String!, code: String!): VerifiedEmail!
 }
