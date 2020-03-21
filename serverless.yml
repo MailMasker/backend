@@ -12,7 +12,7 @@ provider:
         - "logs:PutLogEvents"
       Resource: "arn:aws:logs:*:*:*"
     - Effect: "Allow"
-      Action: "ses:SendRawEmail"
+      Action: "ses:SendEmail"
       Resource: "*"
     - Effect: "Allow"
       Action:
