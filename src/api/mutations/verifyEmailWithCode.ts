@@ -2,20 +2,16 @@ import * as dal from "../../dal/";
 
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
-import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import { ResolverContext } from "../lib/ResolverContext";
 
 export const verifyEmailWithCode = async (
   parent,
   { code, email },
-  { dalContext, currentUserID }: AuthenticatedResolverContext,
+  { dalContext }: ResolverContext,
   info
 ) => {
-  if (!currentUserID) {
-    throw new AuthenticationError("authentication required");
-  }
-
   if (!code || !email) {
-    return new UserInputError(
+    throw new UserInputError(
       "Either the verification code or the email is missing"
     );
   }
