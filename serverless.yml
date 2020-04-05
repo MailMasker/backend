@@ -68,7 +68,19 @@ functions:
       - http:
           path: graphql
           method: post
-          cors: true
+          cors:
+            origin: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - Access-Control-Allow-Credentials
+              - Access-Control-Allow-Headers
+              - Access-Control-Allow-Origin
+            allowCredentials: true
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}

@@ -17,7 +17,6 @@ import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
 import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
-import cors from "cors";
 import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
@@ -134,27 +133,24 @@ const server = new ApolloServer({
 
 const app = express();
 
-// TODO: exclude localhost when promoting to production
-// let whitelist = ["http://localhost:3000", "http://localhost:3001"];
+app.use(cookieParser());
+
 // app.use(
 //   cors({
-//     origin: (origin: any, callback: any) => {
-//       if (whitelist.indexOf(origin) !== -1) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"));
-//       }
-//     },
-//     credentials: true
+//     origin: process.env.WEB_APP_BASE_URL,
+//     credentials: true,
+//     methods: "POST",
 //   })
 // );
 
-app.use(cors());
-
-// app.use(cors({ origin: true, credentials: true }));
-app.use(cookieParser());
-
-server.applyMiddleware({ app });
+server.applyMiddleware({
+  app,
+  cors: {
+    origin: process.env.WEB_APP_BASE_URL,
+    credentials: true,
+    methods: "POST",
+  },
+});
 
 app.get("/playground", graphiql({ endpoint: "/graphql" }));
 
