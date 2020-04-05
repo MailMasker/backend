@@ -9,5 +9,6 @@ jspm_packages
 
 # My commands
 deploy-dev.sh
+deploy-prod.sh
 
 jwt_secret.txt

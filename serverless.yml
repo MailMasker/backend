@@ -4,6 +4,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: us-east-1
+  stage: ${opt:stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -27,7 +28,7 @@ provider:
         - "dynamodb:PutItem"
         - "dynamodb:GetItem"
         - "dynamodb:UpdateItem"
-      Resource: "arn:aws:dynamodb:us-east-1:747558615165:table/*"
+      Resource: "arn:aws:dynamodb:us-east-1:${self:custom.AWS_ACCOUNT.${self:provider.stage}}:table/*"
 
 plugins:
   - serverless-plugin-typescript
@@ -36,6 +37,18 @@ plugins:
 
 custom:
   JWT_SECRET: ${file(jwt_secret.txt)}
+  WEB_APP_BASE_URL:
+    local: http://localhost:3501
+    dev: https://app.mailmasker-dev.com
+    prod: https://app.mailmasker.com
+  API_BASE_URL:
+    local: http://localhost:3501
+    dev: https://n0tccaeafe.execute-api.us-east-1.amazonaws.com/dev/graphql
+    prod: https://5ezbjkpthf.execute-api.us-east-1.amazonaws.com/prod/graphql
+  AWS_ACCOUNT:
+    local: ""
+    dev: 747558615165
+    prod: 726929401065
   dynamodb:
     stages:
       - dev
@@ -56,6 +69,8 @@ functions:
           cors: true
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
+      WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
+      API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
   playground:
     handler: index.handler
     events:

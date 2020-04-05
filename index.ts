@@ -32,6 +32,10 @@ import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
 import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
 
+if (!process.env.WEB_APP_BASE_URL) {
+  throw new Error("Missing WEB_APP_BASE_URL env var");
+}
+
 aws.config.update({ region: "us-east-1" });
 
 const dalContext: DALContext = {
