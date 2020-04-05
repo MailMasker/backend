@@ -8,7 +8,7 @@ import * as path from "path";
 import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
-  ResolverContext
+  ResolverContext,
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
@@ -22,7 +22,6 @@ import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
-import { raw as ddb } from "serverless-dynamodb-client";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
 import jwt from "jsonwebtoken";
@@ -38,15 +37,27 @@ if (!process.env.WEB_APP_BASE_URL) {
 
 aws.config.update({ region: "us-east-1" });
 
+let ddbOptions = {};
+
+// connect to local DB if running offline
+if (process.env.IS_OFFLINE) {
+  ddbOptions = {
+    region: "localhost",
+    endpoint: "http://localhost:8000",
+    accessKeyId: "DEFAULT_ACCESS_KEY", // needed if you don't have aws credentials at all in env
+    secretAccessKey: "DEFAULT_SECRET", // needed if you don't have aws credentials at all in env
+  };
+}
+
 const dalContext: DALContext = {
-  ddb: ddb
+  ddb: new aws.DynamoDB(ddbOptions),
 };
 
 const queryResolvers: QueryResolvers = {
   ping: (parent, args, context, info) => {
     return "pong";
   },
-  me: combineResolvers(authenticated, me)
+  me: combineResolvers(authenticated, me),
 };
 
 const mutationResolvers: MutationResolvers = {
@@ -61,7 +72,7 @@ const mutationResolvers: MutationResolvers = {
 
   createRoute: combineResolvers(authenticated, createRoute),
 
-  verifyEmailWithCode
+  verifyEmailWithCode,
 };
 
 const schema = fs.readFileSync(
@@ -74,7 +85,7 @@ const server = new ApolloServer({
   resolvers: {
     Query: { ...queryResolvers },
     Me: { user },
-    Mutation: { ...mutationResolvers }
+    Mutation: { ...mutationResolvers },
   },
   introspection: true,
   context: async ({ req, res }) => {
@@ -105,7 +116,7 @@ const server = new ApolloServer({
       setAuthCookie: ({ authToken, expires }) => {
         res.cookie("jwt", authToken, {
           httpOnly: true,
-          maxAge: expires
+          maxAge: expires,
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
           // TODO: set example for dev and prod and local
@@ -115,10 +126,10 @@ const server = new ApolloServer({
       clearAuthCookie: () => {
         res.clearCookie("jwt");
       },
-      authToken
+      authToken,
     };
     return context;
-  }
+  },
 });
 
 const app = express();

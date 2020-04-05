@@ -29,11 +29,11 @@ export const createUser: MutationResolvers["createUser"] = async (
 
   const {
     user: { id: userID, username },
-    auth: { authToken, expires }
+    auth: { authToken, expires },
   } = await dal.createUser(dalContext, {
     username: args.username,
     password: args.password,
-    requestUUID: args.uuid
+    requestUUID: args.uuid,
   });
 
   setAuthCookie({ authToken, expires });

@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "dynamo-local": "sls dynamodb start",
+    "dynamo-local": "sls dynamodb start --stage local",
     "generate": "rm -rf .build && graphql-codegen --config codegen.yml",
-    "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage local --httpPort 3500",
+    "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage local",
     "offline-show-response": "sls offline --printOutput",
     "deploy-dev": "./deploy-dev.sh"
   },

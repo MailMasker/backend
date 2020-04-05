@@ -15,8 +15,7 @@
         // "--dontPrintOutput",
         "--stage=local",
         "-P",
-        "4000",
-        "--aws-profile=#PROFILENAME#"
+        "4201"
       ],
       "sourceMaps": true,
       "runtimeArgs": ["--lazy"],

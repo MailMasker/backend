@@ -38,11 +38,11 @@ plugins:
 custom:
   JWT_SECRET: ${file(jwt_secret.txt)}
   WEB_APP_BASE_URL:
-    local: http://localhost:3501
+    local: http://localhost:4200
     dev: https://app.mailmasker-dev.com
     prod: https://app.mailmasker.com
   API_BASE_URL:
-    local: http://localhost:3501
+    local: http://localhost:4201
     dev: https://n0tccaeafe.execute-api.us-east-1.amazonaws.com/dev/graphql
     prod: https://5ezbjkpthf.execute-api.us-east-1.amazonaws.com/prod/graphql
   AWS_ACCOUNT:
@@ -51,9 +51,11 @@ custom:
     prod: 726929401065
   dynamodb:
     stages:
-      - dev
+      - local
     start:
       migrate: true
+      port: 8000
+      inMemory: true
 
 package:
   include:
