@@ -26,8 +26,8 @@ yarn install
 You'll need two terminals. In the first:
 
 ```
-yarn codegen
-yarn debug
+yarn generate
+yarn start
 ```
 
 In the second terminal:
