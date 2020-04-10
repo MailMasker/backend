@@ -7,13 +7,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Serverless Offline",
+      "name": "Run local",
       "program": "${workspaceRoot}/node_modules/serverless/bin/serverless",
       "args": [
         "offline",
         "--noTimeout",
         // "--dontPrintOutput",
         "--stage=local",
+        "--httpsProtocol=./",
         "-P",
         "4201"
       ],
@@ -29,12 +30,6 @@
       "windows": {
         "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless"
       }
-    }
-  ],
-  "compounds": [
-    {
-      "name": "Start Local Development",
-      "configurations": ["Serverless Offline"]
     }
   ]
 }

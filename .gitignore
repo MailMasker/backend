@@ -7,6 +7,9 @@ jspm_packages
 .build
 .buildcache
 
+cert.pem
+key.pem
+
 # My commands
 deploy-dev.sh
 deploy-prod.sh

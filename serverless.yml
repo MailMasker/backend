@@ -38,11 +38,15 @@ plugins:
 custom:
   JWT_SECRET: ${file(jwt_secret.txt)}
   WEB_APP_BASE_URL:
-    local: http://localhost:4200
+    local: https://localhost:4200
     dev: https://app.mailmasker-dev.com
     prod: https://app.mailmasker.com
+  WEB_APP_DOMAIN:
+    local: localhost
+    dev: app.mailmasker-dev.com
+    prod: app.mailmasker.com
   API_BASE_URL:
-    local: http://localhost:4201
+    local: https://localhost:4201
     dev: https://n0tccaeafe.execute-api.us-east-1.amazonaws.com/dev/graphql
     prod: https://5ezbjkpthf.execute-api.us-east-1.amazonaws.com/prod/graphql
   AWS_ACCOUNT:
@@ -84,6 +88,7 @@ functions:
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
+      WEB_APP_DOMAIN: ${self:custom.WEB_APP_DOMAIN.${self:provider.stage}}
       API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
   playground:
     handler: index.handler

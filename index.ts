@@ -79,7 +79,7 @@ const schema = fs.readFileSync(
   "utf8"
 );
 
-const server = new ApolloServer({
+const apollo = new ApolloServer({
   typeDefs: schema,
   resolvers: {
     Query: { ...queryResolvers },
@@ -118,8 +118,11 @@ const server = new ApolloServer({
           maxAge: expires,
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
-          // TODO: set example for dev and prod and local
-          //domain: 'example.com', //set your domain
+          domain: process.env.WEB_APP_DOMAIN,
+
+          // Allows cookies to be sent in cross-site requests (our API in on a different domain than our web app, at least for the time being)
+          // TODO: update this when we get our own domain used on the API instead of the generic Lambda domain
+          sameSite: "none",
         });
       },
       clearAuthCookie: () => {
@@ -143,7 +146,7 @@ app.use(cookieParser());
 //   })
 // );
 
-server.applyMiddleware({
+apollo.applyMiddleware({
   app,
   cors: {
     origin: process.env.WEB_APP_BASE_URL,

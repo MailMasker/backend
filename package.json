@@ -4,7 +4,8 @@
     "generate": "rm -rf .build && graphql-codegen --config codegen.yml",
     "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage local",
     "offline-show-response": "sls offline --printOutput",
-    "deploy-dev": "./deploy-dev.sh"
+    "deploy-dev": "./deploy-dev.sh",
+    "gencerts": "mkcert localhost 127.0.0.1"
   },
   "dependencies": {
     "@types/graphql-resolvers": "^0.2.2",

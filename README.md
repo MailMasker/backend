@@ -23,6 +23,14 @@ yarn install
 
 ## Run it locally
 
+Generate certificate and private key so that the localhost API can be on HTTPS:
+
+```
+yarn gencerts
+```
+
+Rename the certificate and private key to cert.pem and key.pem, respectively.
+
 You'll need two terminals. In the first:
 
 ```
