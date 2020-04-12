@@ -118,7 +118,7 @@ const apollo = new ApolloServer({
           maxAge: expires,
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
-          domain: process.env.WEB_APP_DOMAIN,
+          domain: process.env.API_DOMAIN,
 
           // Allows cookies to be sent in cross-site requests (our API in on a different domain than our web app, at least for the time being)
           // TODO: update this when we get our own domain used on the API instead of the generic Lambda domain
