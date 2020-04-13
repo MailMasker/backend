@@ -1,24 +1,21 @@
 {
   "scripts": {
-    "dynamo-local": "sls dynamodb start --stage local",
+    "dynamo-local": "cd ./local/dynamodb/ && java -Djava.library.path=./ -jar DynamoDBLocal.jar -sharedDb",
     "generate": "rm -rf .build && graphql-codegen --config codegen.yml",
-    "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage local",
+    "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage=local --httpsProtocol=./ --httpPort=4201",
     "offline-show-response": "sls offline --printOutput",
     "deploy-dev": "./deploy-dev.sh",
     "gencerts": "mkcert localhost 127.0.0.1"
   },
   "dependencies": {
-    "@types/graphql-resolvers": "^0.2.2",
     "apollo-server-express": "^2.10.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.4",
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^14.5.8",
     "graphql-playground-middleware-express": "^1.7.12",
     "graphql-resolvers": "^0.3.3",
     "jsonwebtoken": "^8.5.1",
-    "serverless-dynamodb-client": "^0.0.2",
     "serverless-http": "^2.3.0"
   },
   "devDependencies": {
@@ -27,15 +24,15 @@
     "@graphql-codegen/typescript": "1.8.3",
     "@graphql-codegen/typescript-resolvers": "1.8.3",
     "@types/cookie-parser": "^1.4.2",
+    "@types/graphql-resolvers": "^0.2.2",
     "@types/jsonwebtoken": "^8.3.5",
     "@types/uuid": "^3.4.6",
     "aws-sdk": "^2.573.0",
     "prettier": "^1.19.1",
     "serverless": "^1.58.0",
     "serverless-domain-manager": "^3.3.1",
-    "serverless-dynamodb-local": "^0.2.38",
-    "serverless-offline": "^5.12.1",
     "serverless-plugin-typescript": "^1.1.9",
+    "serverless-offline": "^6.1.4",
     "typescript": "^3.7.2"
   }
 }

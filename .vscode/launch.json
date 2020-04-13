@@ -15,7 +15,7 @@
         // "--dontPrintOutput",
         "--stage=local",
         "--httpsProtocol=./",
-        "-P",
+        "--httpPort",
         "4201"
       ],
       "sourceMaps": true,

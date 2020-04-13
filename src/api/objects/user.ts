@@ -10,9 +10,9 @@ export const user: ResolversTypes["user"] = async (
   { dalContext, currentUserID },
   info
 ) => {
-  console.log("parent", parent);
-  console.log("args", args);
-  console.log("info", info);
+  console.debug("parent", parent);
+  console.debug("args", args);
+  console.debug("info", info);
   if (!currentUserID) {
     throw new AuthenticationError("Authentication required");
   }

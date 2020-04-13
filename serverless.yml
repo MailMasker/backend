@@ -32,7 +32,6 @@ provider:
 
 plugins:
   - serverless-plugin-typescript
-  - serverless-dynamodb-local
   - serverless-offline
   - serverless-domain-manager
 
@@ -62,6 +61,10 @@ custom:
     local: ""
     dev: "arn:aws:acm:us-east-1:747558615165:certificate/924444b9-8071-4a3d-b0ec-091850a6dad3"
     prod: "arn:aws:acm:us-east-1:726929401065:certificate/b2d1e024-6f01-4ee0-a0c6-90f292323681"
+  IS_LOCAL:
+    local: true
+    dev: false
+    prod: false
   dynamodb:
     stages:
       - local
@@ -107,125 +110,10 @@ functions:
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
       API_DOMAIN: ${self:custom.API_DOMAIN.${self:provider.stage}}
       API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
+      IS_LOCAL: ${self:custom.IS_LOCAL.${self:provider.stage}}
   playground:
     handler: index.handler
     events:
       - http:
           path: playground
           method: get
-
-resources:
-  Resources:
-    authTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: auth
-        AttributeDefinitions:
-          - AttributeName: AuthToken
-            AttributeType: S
-        KeySchema:
-          - AttributeName: AuthToken
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    userTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: user
-        AttributeDefinitions:
-          - AttributeName: ID
-            AttributeType: S
-          - AttributeName: Username
-            AttributeType: S
-        KeySchema:
-          - AttributeName: ID
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: Username
-            KeySchema:
-              - AttributeName: Username
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-    routeTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: route
-        AttributeDefinitions:
-          - AttributeName: ID
-            AttributeType: S
-          - AttributeName: EmailMaskID
-            AttributeType: S
-        KeySchema:
-          - AttributeName: ID
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: EmailMaskID
-            KeySchema:
-              - AttributeName: EmailMaskID
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-    verifiedEmailTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: verified-email
-        AttributeDefinitions:
-          - AttributeName: ID
-            AttributeType: S
-          - AttributeName: Email
-            AttributeType: S
-        KeySchema:
-          - AttributeName: ID
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: Email
-            KeySchema:
-              - AttributeName: Email
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
-    emailMaskTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: email-mask
-        AttributeDefinitions:
-          - AttributeName: ID
-            AttributeType: S
-          - AttributeName: BaseWithDomain
-            AttributeType: S
-        KeySchema:
-          - AttributeName: ID
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        GlobalSecondaryIndexes:
-          - IndexName: BaseWithDomain
-            KeySchema:
-              - AttributeName: BaseWithDomain
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1

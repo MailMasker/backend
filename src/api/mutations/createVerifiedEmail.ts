@@ -82,7 +82,7 @@ export const createVerifiedEmail = async (
   // Handle promise's fulfilled/rejected states
   await sendPromise
     .then(function(data) {
-      console.log(data.MessageId);
+      console.debug(data.MessageId);
     })
     .catch(function(err) {
       console.error(err, err.stack);

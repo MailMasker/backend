@@ -10,6 +10,8 @@ jspm_packages
 cert.pem
 key.pem
 
+local/dynamodb/shared-local-instance.db
+
 # My commands
 deploy-dev.sh
 deploy-prod.sh
