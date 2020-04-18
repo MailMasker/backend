@@ -6,7 +6,7 @@ import * as path from "path";
 import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
-  ResolverContext
+  ResolverContext,
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
@@ -43,19 +43,19 @@ if (process.env.S_STAGE === "local") {
     region: "localhost",
     endpoint: "http://localhost:8000",
     accessKeyId: "DEFAULT_ACCESS_KEY", // needed if you don't have aws credentials at all in env
-    secretAccessKey: "DEFAULT_SECRET" // needed if you don't have aws credentials at all in env
+    secretAccessKey: "DEFAULT_SECRET", // needed if you don't have aws credentials at all in env
   };
 }
 
 const dalContext: DALContext = {
-  ddb: new aws.DynamoDB(ddbOptions)
+  ddb: new aws.DynamoDB(ddbOptions),
 };
 
 const queryResolvers: QueryResolvers = {
   ping: (parent, args, context, info) => {
     return "pong";
   },
-  me: combineResolvers(authenticated, me)
+  me: combineResolvers(authenticated, me),
 };
 
 const mutationResolvers: MutationResolvers = {
@@ -70,7 +70,7 @@ const mutationResolvers: MutationResolvers = {
 
   createRoute: combineResolvers(authenticated, createRoute),
 
-  verifyEmailWithCode
+  verifyEmailWithCode,
 };
 
 const schema = fs.readFileSync(
@@ -83,7 +83,7 @@ const apollo = new ApolloServer({
   resolvers: {
     Query: { ...queryResolvers },
     Me: { user },
-    Mutation: { ...mutationResolvers }
+    Mutation: { ...mutationResolvers },
   },
   introspection: true,
   context: async ({ req, res }) => {
@@ -121,16 +121,17 @@ const apollo = new ApolloServer({
 
           // Allows cookies to be sent in cross-site requests (our API in on a different domain than our web app, at least for the time being)
           // TODO: update this when we get our own domain used on the API instead of the generic Lambda domain
-          sameSite: "none"
+          sameSite: "none",
         });
       },
       clearAuthCookie: () => {
-        res.clearCookie("jwt");
+        // NOTE: since we have HttpOnly cookies, we can't delete them
+        // res.clearCookie("jwt");
       },
-      authToken
+      authToken,
     };
     return context;
-  }
+  },
 });
 
 const app = express();
@@ -142,8 +143,8 @@ apollo.applyMiddleware({
   cors: {
     origin: process.env.WEB_APP_BASE_URL,
     credentials: true,
-    methods: "POST"
-  }
+    methods: "POST",
+  },
 });
 
 app.get("/playground", graphiql({ endpoint: "/graphql" }));
