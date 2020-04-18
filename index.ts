@@ -37,7 +37,8 @@ aws.config.update({ region: "us-east-1" });
 let ddbOptions = {};
 
 // connect to local DB if running offline
-if (process.env.IS_LOCAL) {
+if (process.env.S_STAGE === "local") {
+  console.log("using local dynamodb");
   ddbOptions = {
     region: "localhost",
     endpoint: "http://localhost:8000",

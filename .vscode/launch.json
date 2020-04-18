@@ -7,7 +7,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run local",
+      "name": "Run API locally",
       "program": "${workspaceRoot}/node_modules/serverless/bin/serverless",
       "args": [
         "offline",
@@ -30,6 +30,20 @@
       "windows": {
         "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run DynamoDB locally",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dynamo-local"],
+      "noDebug": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Start Local Development",
+      "configurations": ["Run DynamoDB locally", "Run API locally"]
     }
   ]
 }
