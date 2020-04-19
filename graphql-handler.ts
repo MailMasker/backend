@@ -2,14 +2,14 @@ import * as aws from "aws-sdk";
 import * as fs from "fs";
 import * as path from "path";
 
-// @ts-ignore
-import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
   ResolverContext,
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
+// @ts-ignore
+import { ApolloServer } from "apollo-server-express";
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
@@ -21,7 +21,6 @@ import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import express from "express";
-import graphiql from "graphql-playground-middleware-express";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
 import serverless from "serverless-http";
@@ -31,10 +30,6 @@ import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
 
 if (!process.env.WEB_APP_BASE_URL) {
   throw new Error("Missing WEB_APP_BASE_URL env var");
-}
-
-if (!process.env.MAIL_DOMAINS || process.env.MAIL_DOMAINS.length === 0) {
-  throw new Error("missing env var process.env.MAIL_DOMAIN");
 }
 
 aws.config.update({ region: "us-east-1" });
@@ -147,13 +142,15 @@ app.use(cookieParser());
 apollo.applyMiddleware({
   app,
   cors: {
-    origin: process.env.WEB_APP_BASE_URL,
+    origin: [
+      process.env.WEB_APP_BASE_URL,
+      // Allow GraphQL Playground (dev only)
+      ...(process.env.S_STAGE === "dev" ? [process.env.API_DOMAIN] : []),
+    ],
     credentials: true,
     methods: "POST",
   },
 });
-
-app.get("/playground", graphiql({ endpoint: "/graphql" }));
 
 const handler = serverless(app);
 

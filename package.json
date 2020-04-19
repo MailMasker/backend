@@ -5,7 +5,8 @@
     "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage=local --httpsProtocol=./ --httpPort=4201",
     "offline-show-response": "sls offline --printOutput",
     "deploy-dev": "./deploy-dev.sh",
-    "gencerts": "mkcert localhost 127.0.0.1"
+    "gencerts": "mkcert localhost 127.0.0.1",
+    "logs-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-graphql --start='1 minute'"
   },
   "dependencies": {
     "apollo-server-express": "^2.10.0",

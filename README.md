@@ -43,3 +43,18 @@ In the second terminal:
 ```
 yarn dynamo-local
 ```
+
+Running GraphQL Playground to test the API:
+
+1. https://localhost:4201/local/playground
+2. Set the URL text box inside the interface itself to `https://localhost:4201/local/graphql` – this is because the local API is at https://localhost:4201/local/graphql
+3. Open Settings in the GraphQL Playground interface and set `request.credentials` to `include`
+4. Set `schema.polling.enable` to `false` in order to make much less noise in your CloudWatch logs
+
+## Running in dev
+
+Test the API at:
+
+1. https://api.mailmasker-dev.com/playground
+2. Open Settings in the GraphQL Playground interface and set `request.credentials` to `include`
+3. Set `schema.polling.enable` to `false` in order to make much less noise in your CloudWatch logs
