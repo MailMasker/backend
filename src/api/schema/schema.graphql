@@ -19,10 +19,13 @@ type DeleteUserPayload {
 # An EmailMask cannot be deleted, but a Route.forwardTo can be deleted because it's important for users' data rights.
 type EmailMask {
   id: ID!
-  # For x+y@1nt.email, "x" is the base
-  base: String!
+  # For x+y@1nt.email, "x" is the alias
+  alias: String!
   # For x+y@1nt.email, "1nt.email" is the domain
   domain: String!
+  disabled: Boolean!
+  expires: Int
+  children: [EmailMask!]!
 }
 
 # A User can't be deleted, but its username can be cleared at a user's request
@@ -65,7 +68,7 @@ type Mutation {
   createVerifiedEmail(email: String!): VerifiedEmail!
 
   # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
-  createEmailMask(raw: String!): EmailMask!
+  createEmailMask(raw: String!, parentEmailMaskID: String): EmailMask!
 
   createRoute(
     # redirectToVerifiedEmailID represents the email address to which we should redirect/forward

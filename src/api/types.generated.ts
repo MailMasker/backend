@@ -20,17 +20,14 @@ export type DeleteUserPayload = {
   authToken?: Maybe<Scalars['String']>,
 };
 
-/** 
- * Once created, an EmailMask is reserved forever so that it cannot be used by another user
- * An EmailMask cannot be deleted, but a Route.forwardTo can be deleted because it's important for users' data rights.
- **/
 export type EmailMask = {
    __typename?: 'EmailMask',
   id: Scalars['ID'],
-  /** For x+y@1nt.email, "x" is the base */
-  base: Scalars['String'],
-  /** For x+y@1nt.email, "1nt.email" is the domain */
+  alias: Scalars['String'],
   domain: Scalars['String'],
+  disabled: Scalars['Boolean'],
+  expires?: Maybe<Scalars['Int']>,
+  children: Array<EmailMask>,
 };
 
 export type Me = {
@@ -41,11 +38,9 @@ export type Me = {
 export type Mutation = {
    __typename?: 'Mutation',
   authenticate?: Maybe<Scalars['Boolean']>,
-  /** Token is optional because the server will first attempt to read the token from a cookie, if present */
   unauthenticate?: Maybe<Scalars['Boolean']>,
   createUser: CreateUserPayload,
   createVerifiedEmail: VerifiedEmail,
-  /** For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing) */
   createEmailMask: EmailMask,
   createRoute: Route,
   verifyEmailWithCode: VerifiedEmail,
@@ -76,7 +71,8 @@ export type MutationCreateVerifiedEmailArgs = {
 
 
 export type MutationCreateEmailMaskArgs = {
-  raw: Scalars['String']
+  raw: Scalars['String'],
+  parentEmailMaskID?: Maybe<Scalars['String']>
 };
 
 
@@ -97,7 +93,6 @@ export type Query = {
   ping: Scalars['String'],
 };
 
-/** A Route can not be hard deleted, but the email address in redirectToVerifiedEmail can be cleared at a user's request */
 export type Route = {
    __typename?: 'Route',
   id: Scalars['ID'],
@@ -107,7 +102,6 @@ export type Route = {
   disabled: Scalars['Boolean'],
 };
 
-/** A User can't be deleted, but its username can be cleared at a user's request */
 export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
@@ -117,11 +111,9 @@ export type User = {
   verifiedEmails: Array<VerifiedEmail>,
 };
 
-/** A VerifiedEmail is one for which ownership has been verified when `verified` is true */
 export type VerifiedEmail = {
    __typename?: 'VerifiedEmail',
   id: Scalars['ID'],
-  /** If deleted, then `email` will be null */
   email?: Maybe<Scalars['String']>,
   verified: Scalars['Boolean'],
 };
@@ -240,8 +232,11 @@ export type DeleteUserPayloadResolvers<ContextType = any, ParentType extends Res
 
 export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversParentTypes['EmailMask'] = ResolversParentTypes['EmailMask']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
-  base?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  alias?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
+  expires?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  children?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
 }>;
 
 export type MeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Me'] = ResolversParentTypes['Me']> = ResolversObject<{

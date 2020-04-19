@@ -19,6 +19,7 @@ import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
+import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import express from "express";
 import graphiql from "graphql-playground-middleware-express";
 import jwt from "jsonwebtoken";
@@ -83,6 +84,7 @@ const apollo = new ApolloServer({
   resolvers: {
     Query: { ...queryResolvers },
     Me: { user },
+    EmailMask: { children: emailMaskChildren },
     Mutation: { ...mutationResolvers },
   },
   introspection: true,
