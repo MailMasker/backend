@@ -18,11 +18,11 @@ export const emailMaskChildren: ResolversTypes["children"] = async (
     throw new AuthenticationError("Authentication required");
   }
 
-  if (parent.childIDs.length === 0) {
+  if (!parent.childEmailMaskIDs || parent.childEmailMaskIDs.length === 0) {
     return [];
   }
 
   return Promise.all(
-    parent.childIDs.map((id) => dal.emailMaskByID(dalContext, id))
+    parent.childEmailMaskIDs.map((id) => dal.emailMaskByID(dalContext, id))
   );
 };

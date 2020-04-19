@@ -24,7 +24,7 @@ type EmailMask {
   # For x+y@1nt.email, "1nt.email" is the domain
   domain: String!
   disabled: Boolean!
-  expires: Int
+  parentEmailMaskID: ID
   children: [EmailMask!]!
 }
 
@@ -68,7 +68,7 @@ type Mutation {
   createVerifiedEmail(email: String!): VerifiedEmail!
 
   # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
-  createEmailMask(raw: String!, parentEmailMaskID: String): EmailMask!
+  createEmailMask(raw: String!, parentEmailMaskID: ID): EmailMask!
 
   createRoute(
     # redirectToVerifiedEmailID represents the email address to which we should redirect/forward

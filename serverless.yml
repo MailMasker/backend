@@ -62,6 +62,13 @@ custom:
     local: ""
     dev: "arn:aws:acm:us-east-1:747558615165:certificate/924444b9-8071-4a3d-b0ec-091850a6dad3"
     prod: "arn:aws:acm:us-east-1:726929401065:certificate/b2d1e024-6f01-4ee0-a0c6-90f292323681"
+  MAIL_DOMAINS:
+    local:
+      - mailmasker-local.com
+    dev:
+      - mailmasker-dev.com
+    prod:
+      - mailmasker.com
   dynamodb:
     stages:
       - local
@@ -108,6 +115,7 @@ functions:
       API_DOMAIN: ${self:custom.API_DOMAIN.${self:provider.stage}}
       API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
       S_STAGE: ${self:provider.stage}
+      MAIL_DOMAINS: ${self:custom.MAIL_DOMAINS.${self:provider.stage}}
   playground:
     handler: index.handler
     events:

@@ -32,9 +32,9 @@ export const deconstructMailMask = ({
   }
 
   return {
-    alias,
+    alias: alias.toLowerCase(),
     mailMaskParts,
-    domain,
+    domain: domain.toLowerCase(),
     expiryToken:
       expiryTokens.length > 0
         ? expiryTokens[expiryTokens.length - 1]

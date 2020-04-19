@@ -26,7 +26,7 @@ export type EmailMask = {
   alias: Scalars['String'],
   domain: Scalars['String'],
   disabled: Scalars['Boolean'],
-  expires?: Maybe<Scalars['Int']>,
+  parentEmailMaskID?: Maybe<Scalars['ID']>,
   children: Array<EmailMask>,
 };
 
@@ -72,7 +72,7 @@ export type MutationCreateVerifiedEmailArgs = {
 
 export type MutationCreateEmailMaskArgs = {
   raw: Scalars['String'],
-  parentEmailMaskID?: Maybe<Scalars['String']>
+  parentEmailMaskID?: Maybe<Scalars['ID']>
 };
 
 
@@ -235,7 +235,7 @@ export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversPa
   alias?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
-  expires?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
+  parentEmailMaskID?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   children?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
 }>;
 

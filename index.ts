@@ -33,6 +33,10 @@ if (!process.env.WEB_APP_BASE_URL) {
   throw new Error("Missing WEB_APP_BASE_URL env var");
 }
 
+if (!process.env.MAIL_DOMAINS || process.env.MAIL_DOMAINS.length === 0) {
+  throw new Error("missing env var process.env.MAIL_DOMAIN");
+}
+
 aws.config.update({ region: "us-east-1" });
 
 let ddbOptions = {};
