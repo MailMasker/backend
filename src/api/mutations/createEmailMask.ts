@@ -4,8 +4,8 @@ import { AuthenticationError, UserInputError } from "apollo-server-core";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { EmailMask } from "../types.generated";
-import SupportedMailDomains from "../lib/supportedMailDomains";
-import { deconstructMailMask } from "../lib/deconstructMailMask";
+import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
+import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
 
 export const createEmailMask = async (
   parent,
