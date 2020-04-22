@@ -38,12 +38,12 @@ export const createRoute = async (
   }
 
   try {
-    const { route } = await dal.createRoute(
+    const route = await dal.createRoute(
       { ddb: context.dalContext.ddb },
       {
         redirectToVerifiedEmailID: args.redirectToVerifiedEmailID,
         ownerUserID: currentUser.id,
-        emailMaskID: args.emailMaskID
+        emailMaskID: args.emailMaskID,
       }
     );
     // TODO: fill in "expires" and "disable" values once they're supported
@@ -52,7 +52,7 @@ export const createRoute = async (
       emailMask,
       expires: 0,
       disabled: false,
-      redirectToVerifiedEmail: verifiedEmail
+      redirectToVerifiedEmail: verifiedEmail,
     };
   } catch (err) {
     if (err instanceof EmailMaskInUseInRouteError) {
