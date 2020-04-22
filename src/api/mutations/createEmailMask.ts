@@ -30,9 +30,7 @@ export const createEmailMask = async (
     );
   }
 
-  const {
-    emailMask: { id },
-  } = await dal.createEmailMask(dalContext, {
+  const { id } = await dal.createEmailMask(dalContext, {
     ownerUserID: currentUserID,
     alias,
     domain,
