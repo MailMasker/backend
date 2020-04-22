@@ -41,6 +41,7 @@ export type Mutation = {
   unauthenticate?: Maybe<Scalars['Boolean']>,
   createUser: CreateUserPayload,
   createVerifiedEmail: VerifiedEmail,
+  resendVerificationEmail: VerifiedEmail,
   createEmailMask: EmailMask,
   createRoute: Route,
   verifyEmailWithCode: VerifiedEmail,
@@ -66,6 +67,11 @@ export type MutationCreateUserArgs = {
 
 
 export type MutationCreateVerifiedEmailArgs = {
+  email: Scalars['String']
+};
+
+
+export type MutationResendVerificationEmailArgs = {
   email: Scalars['String']
 };
 
@@ -248,6 +254,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   unauthenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, MutationUnauthenticateArgs>,
   createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid'>>,
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
+  resendVerificationEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationResendVerificationEmailArgs, 'email'>>,
   createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'raw'>>,
   createRoute?: Resolver<ResolversTypes['Route'], ParentType, ContextType, RequireFields<MutationCreateRouteArgs, 'redirectToVerifiedEmailID' | 'emailMaskID'>>,
   verifyEmailWithCode?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationVerifyEmailWithCodeArgs, 'email' | 'code'>>,

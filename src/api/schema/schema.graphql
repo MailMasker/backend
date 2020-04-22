@@ -66,6 +66,7 @@ type Mutation {
   ): CreateUserPayload!
 
   createVerifiedEmail(email: String!): VerifiedEmail!
+  resendVerificationEmail(email: String!): VerifiedEmail!
 
   # For x+y@1nt.email, "x+y@1nt.email" is the raw value (i.e. the entire thing)
   createEmailMask(raw: String!, parentEmailMaskID: ID): EmailMask!

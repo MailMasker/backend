@@ -2,19 +2,22 @@ import * as dal from "../../dal/createVerifiedEmail";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { NotFoundError } from "../../dal";
+import sendVerificationEmail from "../lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
-// TODO: move this into the context
-
-// Load the AWS SDK for Node.js
-var AWS = require("aws-sdk");
-// Set the region
-AWS.config.update({ region: "REGION" });
+if (!process.env.WEB_APP_BASE_URL) {
+  throw new Error("missing process.env.WEB_APP_BASE_URL");
+}
 
 export const createVerifiedEmail = async (
   parent,
   args,
-  { setAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,
+  {
+    setAuthCookie,
+    dalContext,
+    currentUserID,
+    ses,
+  }: AuthenticatedResolverContext,
   info
 ) => {
   if (!currentUserID) {
@@ -24,7 +27,7 @@ export const createVerifiedEmail = async (
   try {
     existingVerifiedEmail = await verifiedEmailByEmail(dalContext, {
       email: args.email,
-      ownerUserID: currentUserID
+      ownerUserID: currentUserID,
     });
   } catch (err) {
     if (err instanceof NotFoundError) {
@@ -47,46 +50,13 @@ export const createVerifiedEmail = async (
 
   const response = await dal.createVerifiedEmail(dalContext, {
     email: args.email,
-    userID: currentUserID
+    userID: currentUserID,
   });
 
-  // Create sendEmail params
-  const params = {
-    Destination: {
-      ToAddresses: ["jonsibley@gmail.com"]
-    },
-    Message: {
-      /* required */
-      Body: {
-        Html: {
-          Charset: "UTF-8",
-          // TODO: set up for various environments: dev and prod
-          Data: `Dear username,
-
-<a href="http://localhost:3001/verify-email/jonsibley+22@gmail.com/code/c6263648-5783-45a3-904a-e394ad88851a">Click here</a> to verify your email address (jonsibley@gmail.com).`
-        }
-      },
-      Subject: {
-        Charset: "UTF-8",
-        Data: "[1nt] Verify your email address"
-      }
-    },
-    Source: "support@1nt.email"
-  };
-
-  // Create the promise and SES service object
-  const sendPromise = new AWS.SES({ apiVersion: "2010-12-01" })
-    .sendEmail(params)
-    .promise();
-
-  // Handle promise's fulfilled/rejected states
-  await sendPromise
-    .then(function(data) {
-      console.debug(data.MessageId);
-    })
-    .catch(function(err) {
-      console.error(err, err.stack);
-    });
+  await sendVerificationEmail(ses, {
+    verificationCode: response.verificationCode,
+    email: response.email,
+  });
 
   return response;
 };

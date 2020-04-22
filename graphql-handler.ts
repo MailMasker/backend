@@ -1,4 +1,3 @@
-import * as aws from "aws-sdk";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -8,6 +7,7 @@ import {
 } from "./src/api/lib/ResolverContext";
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
+import AWS from "aws-sdk";
 // @ts-ignore
 import { ApolloServer } from "apollo-server-express";
 import { DALContext } from "./src/dal/DALContext";
@@ -23,16 +23,20 @@ import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
+import { resendVerificationEmail } from "./src/api/mutations/resendVerificationEmail";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { user } from "./src/api/objects/user";
 import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
 
 if (!process.env.WEB_APP_BASE_URL) {
-  throw new Error("Missing WEB_APP_BASE_URL env var");
+  throw new Error("missing process.env.WEB_APP_BASE_URL");
+}
+if (!process.env.API_DOMAIN) {
+  throw new Error("missing process.env.API_DOMAIN");
 }
 
-aws.config.update({ region: "us-east-1" });
+AWS.config.update({ region: "us-east-1" });
 
 let ddbOptions = {};
 
@@ -48,7 +52,7 @@ if (process.env.S_STAGE === "local") {
 }
 
 const dalContext: DALContext = {
-  ddb: new aws.DynamoDB(ddbOptions),
+  ddb: new AWS.DynamoDB(ddbOptions),
 };
 
 const queryResolvers: QueryResolvers = {
@@ -65,6 +69,10 @@ const mutationResolvers: MutationResolvers = {
   createUser,
 
   createVerifiedEmail: combineResolvers(authenticated, createVerifiedEmail),
+  resendVerificationEmail: combineResolvers(
+    authenticated,
+    resendVerificationEmail
+  ),
 
   createEmailMask: combineResolvers(authenticated, createEmailMask),
 
@@ -130,6 +138,7 @@ const apollo = new ApolloServer({
         // res.clearCookie("jwt");
       },
       authToken,
+      ses: new AWS.SES({ apiVersion: "2010-12-01" }),
     };
     return context;
   },
@@ -139,16 +148,18 @@ const app = express();
 
 app.use(cookieParser());
 
+const allowedOrigins: string[] = [
+  process.env.WEB_APP_BASE_URL,
+  // Allow GraphQL Playground (dev only)
+  ...(process.env.S_STAGE === "dev"
+    ? [process.env.API_DOMAIN ?? ""]
+    : ([] as string[])),
+];
+
 apollo.applyMiddleware({
   app,
   cors: {
-    origin: [
-      process.env.WEB_APP_BASE_URL,
-      // Allow GraphQL Playground (dev only)
-      ...(process.env.S_STAGE === "dev"
-        ? [process.env.API_DOMAIN]
-        : ([] as string[])),
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: "POST",
   },
