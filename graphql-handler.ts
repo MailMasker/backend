@@ -145,7 +145,9 @@ apollo.applyMiddleware({
     origin: [
       process.env.WEB_APP_BASE_URL,
       // Allow GraphQL Playground (dev only)
-      ...(process.env.S_STAGE === "dev" ? [process.env.API_DOMAIN] : []),
+      ...(process.env.S_STAGE === "dev"
+        ? [process.env.API_DOMAIN]
+        : ([] as string[])),
     ],
     credentials: true,
     methods: "POST",

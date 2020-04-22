@@ -6,7 +6,7 @@ const app = express();
 
 // app.use(cookieParser());
 
-if (process.env.S_STAGE === "dev") {
+if (process.env.S_STAGE === "local" || process.env.S_STAGE === "dev") {
   app.get("/playground", graphiql({ endpoint: "/graphql" }));
 }
 

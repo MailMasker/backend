@@ -1,4 +1,3 @@
-import { ApolloError } from "apollo-server-core";
 import { MutationAuthenticateArgs } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-express";
