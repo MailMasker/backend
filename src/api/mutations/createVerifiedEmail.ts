@@ -12,12 +12,7 @@ if (!process.env.WEB_APP_BASE_URL) {
 export const createVerifiedEmail = async (
   parent,
   args,
-  {
-    setAuthCookie,
-    dalContext,
-    currentUserID,
-    ses,
-  }: AuthenticatedResolverContext,
+  { dalContext, currentUserID, ses }: AuthenticatedResolverContext,
   info
 ) => {
   if (!currentUserID) {
@@ -53,10 +48,12 @@ export const createVerifiedEmail = async (
     userID: currentUserID,
   });
 
-  await sendVerificationEmail(ses, {
-    verificationCode: response.verificationCode,
-    email: response.email,
-  });
+  if (process.env.S_STAGE !== "local") {
+    await sendVerificationEmail(ses, {
+      verificationCode: response.verificationCode,
+      email: response.email,
+    });
+  }
 
   return response;
 };

@@ -12,6 +12,7 @@
     "apollo-server-express": "^2.10.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.4",
+    "dayjs": "^1.8.25",
     "express": "^4.17.1",
     "graphql": "^14.5.8",
     "graphql-playground-middleware-express": "^1.7.12",
@@ -32,8 +33,8 @@
     "prettier": "^1.19.1",
     "serverless": "^1.58.0",
     "serverless-domain-manager": "^3.3.1",
-    "serverless-plugin-typescript": "^1.1.9",
     "serverless-offline": "^6.1.4",
+    "serverless-plugin-typescript": "^1.1.9",
     "typescript": "^3.7.2"
   }
 }

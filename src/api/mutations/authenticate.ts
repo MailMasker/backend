@@ -33,9 +33,13 @@ export const authenticate = async (
 
     console.debug("authtoken during authenticate: ", authToken);
 
-    const { expires } = await createAuthToken(dalContext, authToken, user.id);
+    const { secondsUntilExpiry } = await createAuthToken(
+      dalContext,
+      authToken,
+      user.id
+    );
 
-    setAuthCookie({ authToken, expires });
+    setAuthCookie({ authToken, secondsUntilExpiry });
 
     return true;
   } catch (error) {

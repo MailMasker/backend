@@ -7,8 +7,7 @@ type Route {
   id: ID!
   redirectToVerifiedEmail: VerifiedEmail!
   emailMask: EmailMask!
-  expires: Int
-  disabled: Boolean!
+  expiresISO: Int
 }
 
 type DeleteUserPayload {
@@ -23,7 +22,6 @@ type EmailMask {
   alias: String!
   # For x+y@1nt.email, "1nt.email" is the domain
   domain: String!
-  disabled: Boolean!
   parentEmailMaskID: ID
   children: [EmailMask!]!
 }

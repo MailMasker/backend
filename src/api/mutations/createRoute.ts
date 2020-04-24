@@ -4,7 +4,6 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { EmailMaskInUseInRouteError } from "../../dal/createRoute";
-import { MutationResolvers } from "../types.generated";
 import { ensureAuthenticated } from "../lib/ensureAuthenticated";
 
 export const createRoute = async (
@@ -46,11 +45,10 @@ export const createRoute = async (
         emailMaskID: args.emailMaskID,
       }
     );
-    // TODO: fill in "expires" and "disable" values once they're supported
     return {
       id: route.id,
       emailMask,
-      expires: 0,
+      expires: route.expiresMS,
       disabled: false,
       redirectToVerifiedEmail: verifiedEmail,
     };

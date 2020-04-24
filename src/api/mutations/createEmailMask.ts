@@ -10,7 +10,7 @@ import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
 export const createEmailMask = async (
   parent,
   { raw, parentEmailMaskID },
-  { setAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,
+  { dalContext, currentUserID }: AuthenticatedResolverContext,
   info
 ): Promise<EmailMask> => {
   if (!currentUserID) {
@@ -43,6 +43,5 @@ export const createEmailMask = async (
     domain,
     parentEmailMaskID,
     children: [],
-    disabled: false,
   };
 };

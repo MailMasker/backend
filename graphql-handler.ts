@@ -120,10 +120,10 @@ const apollo = new ApolloServer({
     const context: ResolverContext | AuthenticatedResolverContext = {
       currentUserID,
       dalContext,
-      setAuthCookie: ({ authToken, expires }) => {
+      setAuthCookie: ({ authToken, secondsUntilExpiry }) => {
         res.cookie("jwt", authToken, {
           httpOnly: true,
-          maxAge: expires,
+          maxAge: secondsUntilExpiry,
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
           domain: process.env.API_DOMAIN,

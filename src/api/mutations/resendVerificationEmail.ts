@@ -1,7 +1,4 @@
-import * as dal from "../../dal/createVerifiedEmail";
-
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
-import { NotFoundError } from "../../dal";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
@@ -23,12 +20,12 @@ export const resendVerificationEmail = async (
     ownerUserID: currentUserID,
   });
 
-  const response = await dal.createVerifiedEmail(dalContext, {
-    email: args.email,
-    userID: currentUserID,
-  });
+  if (process.env.S_STAGE !== "local") {
+    await sendVerificationEmail(ses, {
+      email: existingVerifiedEmail.email,
+      verificationCode: existingVerifiedEmail.verificationCode,
+    });
+  }
 
-  await sendVerificationEmail(ses, response);
-
-  return response;
+  return existingVerifiedEmail;
 };

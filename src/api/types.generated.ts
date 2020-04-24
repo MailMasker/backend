@@ -25,7 +25,6 @@ export type EmailMask = {
   id: Scalars['ID'],
   alias: Scalars['String'],
   domain: Scalars['String'],
-  disabled: Scalars['Boolean'],
   parentEmailMaskID?: Maybe<Scalars['ID']>,
   children: Array<EmailMask>,
 };
@@ -104,8 +103,7 @@ export type Route = {
   id: Scalars['ID'],
   redirectToVerifiedEmail: VerifiedEmail,
   emailMask: EmailMask,
-  expires?: Maybe<Scalars['Int']>,
-  disabled: Scalars['Boolean'],
+  expiresISO?: Maybe<Scalars['Int']>,
 };
 
 export type User = {
@@ -240,7 +238,6 @@ export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversPa
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   alias?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   domain?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
-  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
   parentEmailMaskID?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>,
   children?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
 }>;
@@ -269,8 +266,7 @@ export type RouteResolvers<ContextType = any, ParentType extends ResolversParent
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   redirectToVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType>,
   emailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType>,
-  expires?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
-  disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>,
+  expiresISO?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>,
 }>;
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
