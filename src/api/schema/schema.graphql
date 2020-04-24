@@ -7,7 +7,7 @@ type Route {
   id: ID!
   redirectToVerifiedEmail: VerifiedEmail!
   emailMask: EmailMask!
-  expiresISO: Int
+  expiresISO: String
 }
 
 type DeleteUserPayload {

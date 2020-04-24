@@ -48,7 +48,7 @@ export const createRoute = async (
     return {
       id: route.id,
       emailMask,
-      expires: route.expiresMS,
+      expiresISO: route.expiresISO,
       disabled: false,
       redirectToVerifiedEmail: verifiedEmail,
     };
