@@ -27,6 +27,7 @@ export default async function sendVerificationEmail(
         Data: "[Mail Masker] Verify your email address",
       },
     },
+    // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
     Source: `support@${SupportedMailDomains[0]}`,
   };
 
