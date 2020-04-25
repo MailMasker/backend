@@ -21,7 +21,7 @@ export const createRoute = async (
   );
   if (verifiedEmail.ownerUserID !== currentUser.id) {
     throw new ForbiddenError(
-      `the verified email ${args.redirectToVerifiedEmailID} belongs to user ${verifiedEmail.ownerUserID}, not ${currentUser.id}`
+      `you do not have access to the Verified Email with ID ${verifiedEmail.id}`
     );
   }
 
@@ -32,7 +32,7 @@ export const createRoute = async (
   );
   if (emailMask.ownerUserID !== currentUser.id) {
     throw new ForbiddenError(
-      `the email mask ${args.emailMaskID} belongs to user ${emailMask.ownerUserID}, not ${currentUser.id}`
+      `you do not have access to the Email Mask with ID ${args.emailMaskID}`
     );
   }
 

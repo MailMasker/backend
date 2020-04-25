@@ -24,24 +24,35 @@ export const user: ResolversTypes["user"] = async (
     routeIDs,
   } = await userByID(dalContext, currentUserID);
 
+  // Look up email masks in advance to save DDB lookups
+  const [emailMasks, verifiedEmails] = await Promise.all([
+    Promise.all(emailMaskIDs.map((id) => dal.emailMaskByID(dalContext, id))),
+    Promise.all(
+      verifiedEmailIDs.map((id) => dal.verifiedEmailByID(dalContext, id))
+    ),
+  ]);
+
   return {
     id,
     username,
-    verifiedEmails: () =>
-      Promise.all(
-        verifiedEmailIDs.map((id) => dal.verifiedEmailByID(dalContext, id))
-      ),
-    emailMasks: () =>
-      Promise.all(emailMaskIDs.map((id) => dal.emailMaskByID(dalContext, id))),
+    verifiedEmails,
+    emailMasks,
     routes: () =>
       dal.routesByIDs(dalContext, routeIDs).then((routes) =>
         routes.map((route) => ({
           ...route,
-          emailMask: dal.emailMaskByID(dalContext, route.emailMaskID),
-          redirectToVerifiedEmail: dal.verifiedEmailByID(
-            dalContext,
-            route.redirectToVerifiedEmailID
-          ),
+          emailMask:
+            // this saves some look-ups
+            emailMasks.find(
+              (emailMask) => emailMask.id === route.emailMaskID
+            ) ?? dal.emailMaskByID(dalContext, route.emailMaskID), // Really, we should never have to do the `dal.emailMaskByID` lookup
+          // this saves some look-ups
+          redirectToVerifiedEmail:
+            verifiedEmails.find(
+              (verifiedEmail) =>
+                verifiedEmail.id === route.redirectToVerifiedEmailID
+            ) ??
+            dal.verifiedEmailByID(dalContext, route.redirectToVerifiedEmailID),
         }))
       ),
   };

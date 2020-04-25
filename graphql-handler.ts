@@ -23,9 +23,11 @@ import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
+import { redirectToVerifiedEmail } from "./src/api/objects/redirectToVerifiedEmail";
 import { resendVerificationEmail } from "./src/api/mutations/resendVerificationEmail";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
+import { updateRoute } from "./src/api/mutations/updateRoute";
 import { user } from "./src/api/objects/user";
 import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
 
@@ -77,6 +79,7 @@ const mutationResolvers: MutationResolvers = {
   createEmailMask: combineResolvers(authenticated, createEmailMask),
 
   createRoute: combineResolvers(authenticated, createRoute),
+  updateRoute: combineResolvers(authenticated, updateRoute),
 
   verifyEmailWithCode,
 };
@@ -91,6 +94,7 @@ const apollo = new ApolloServer({
   resolvers: {
     Query: { ...queryResolvers },
     Me: { user },
+    Route: { redirectToVerifiedEmail },
     EmailMask: { children: emailMaskChildren },
     Mutation: { ...mutationResolvers },
   },

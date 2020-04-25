@@ -22,7 +22,7 @@
       "runtimeArgs": ["--lazy"],
       "outFiles": ["${workspaceFolder}/.webpack/**/*.js"],
       "protocol": "inspector",
-      "runtimeExecutable": "node",
+      "runtimeExecutable": "/Users/jonsibley/.nvm/versions/node/v13.12.0/bin/node",
       "env": {
         // Here we set some environment vars that should be set locally.
         // They can and will overwrite the ones coming from your serverless.yml
