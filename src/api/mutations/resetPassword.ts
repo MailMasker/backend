@@ -28,94 +28,101 @@ export const resetPassword = async (
   }
 
   let foundMatchingCode = false;
+  let foundDestionationEmail = false;
   for (let i = 0; i < resetPasswordRequests.length; i++) {
     const request = resetPasswordRequests[i];
     if (request.code === args.code) {
       foundMatchingCode = true;
-      if (dayjs().isBefore(dayjs(request.expiresISO))) {
-        await updateUser(context.dalContext, args.userID, {
-          password: args.newPassword,
-        });
+      if (!dayjs().isBefore(dayjs(request.expiresISO))) {
+        throw new Error("this password reset request has expired");
+      }
 
-        const user = await userByID(context.dalContext, args.userID);
-        const verifiedEmailsForUser = await Promise.all(
-          user.verifiedEmailIDs.map((id) =>
-            verifiedEmailByID(context.dalContext, id)
+      const userPreUpdate = await userByID(context.dalContext, args.userID);
+      const verifiedEmailsForUser = await Promise.all(
+        userPreUpdate.verifiedEmailIDs.map((id) =>
+          verifiedEmailByID(context.dalContext, id)
+        )
+      );
+      const destinationEmails = verifiedEmailsForUser
+        .filter(({ deleted }) => !deleted)
+        .map(({ email }) => email);
+
+      await updateUser(context.dalContext, userPreUpdate.id, {
+        password: args.newPassword,
+      });
+      if (destinationEmails.length === 0) {
+        console.error(
+          new Error(
+            `password reset took place for user ${args.userID}, but there are no email addresses to send confirmation to`
           )
         );
-        const destinationEmails = verifiedEmailsForUser
-          .filter(({ deleted }) => !deleted)
-          .map(({ email }) => email);
-        if (destinationEmails.length === 0) {
-          console.error(
-            new Error(
-              `password reset took place for user ${args.userID}, but there are no email addresses to send confirmation to`
-            )
-          );
-        }
-
-        if (process.env.S_STAGE !== "local") {
-          await Promise.all(
-            destinationEmails.map((email) => {
-              const params = {
-                Destination: {
-                  ToAddresses: [email],
-                },
-                Message: {
-                  Body: {
-                    Html: {
-                      Charset: "UTF-8",
-                      Data: `Your password has been reset. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
-                    },
-                  },
-                  Subject: {
-                    Charset: "UTF-8",
-                    Data: "[Mail Masker] Reset your password",
-                  },
-                },
-                // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
-                Source: `support@${SupportedMailDomains[0]}`,
-              };
-
-              // Create the promise and SES service object
-              const sendPromise = context.ses.sendEmail(params).promise();
-
-              // Handle promise's fulfilled/rejected states
-              return sendPromise
-                .then(function(data) {
-                  console.debug(data.MessageId);
-                })
-                .catch(function(err) {
-                  console.error(err, err.stack);
-                  throw new Error(
-                    "We were unable to send a password reset email"
-                  );
-                });
-            })
-          );
-        }
-
-        const authToken = jwt.sign(
-          { username: user.username, userID: user.id },
-          process.env.JWT_SECRET as string
-        );
-
-        const { secondsUntilExpiry } = await createAuthToken(
-          context.dalContext,
-          authToken,
-          user.id
-        );
-
-        context.setAuthCookie({ authToken, secondsUntilExpiry });
-
-        return true;
+      } else {
+        foundDestionationEmail = true;
       }
+
+      if (process.env.S_STAGE !== "local") {
+        await Promise.all(
+          destinationEmails.map((email) => {
+            const params = {
+              Destination: {
+                ToAddresses: [email],
+              },
+              Message: {
+                Body: {
+                  Html: {
+                    Charset: "UTF-8",
+                    Data: `Your password has been reset. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
+                  },
+                },
+                Subject: {
+                  Charset: "UTF-8",
+                  Data: "[Mail Masker] Reset your password",
+                },
+              },
+              // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
+              Source: `support@${SupportedMailDomains[0]}`,
+            };
+
+            // Create the promise and SES service object
+            const sendPromise = context.ses.sendEmail(params).promise();
+
+            // Handle promise's fulfilled/rejected states
+            return sendPromise
+              .then(function(data) {
+                console.debug(data.MessageId);
+              })
+              .catch(function(err) {
+                console.error(err, err.stack);
+                throw new Error(
+                  "We were unable to send a password reset email"
+                );
+              });
+          })
+        );
+      }
+
+      const authToken = jwt.sign(
+        { username: userPreUpdate.username, userID: userPreUpdate.id },
+        process.env.JWT_SECRET as string
+      );
+
+      const { secondsUntilExpiry } = await createAuthToken(
+        context.dalContext,
+        authToken,
+        userPreUpdate.id
+      );
+
+      context.setAuthCookie({ authToken, secondsUntilExpiry });
+
+      return true;
     }
   }
 
   if (!foundMatchingCode) {
-    throw new Error("the code you provided did not match our records");
+    throw new Error("We could not locate your password reset request");
+  } else if (!foundDestionationEmail) {
+    throw new Error("This account");
   } else {
-    throw new Error("the password reset request has expired");
+    throw new Error("An unknown error has occurred");
   }
 };

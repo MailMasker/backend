@@ -105,8 +105,8 @@ export const sendResetPasswordEmail = async (
                 Charset: "UTF-8",
                 Data: `<p>Your username is ${user.username}</p><p><a href="${
                   process.env.WEB_APP_BASE_URL
-                }/reset-password/${
-                  args.usernameOrEmail
+                }/reset-password/user/${
+                  user.id
                 }/code/${verificationCode}/username/${
                   user.username
                 }">Click here</a> to choose a new password (${email}).</p><p>This link expires ${dayjs().to(
@@ -133,7 +133,9 @@ export const sendResetPasswordEmail = async (
           })
           .catch(function(err) {
             console.error(err, err.stack);
-            throw new Error("We were unable to send a password reset email");
+            throw new Error(
+              "We were unable to send one or more password reset emails"
+            );
           });
       })
     );
