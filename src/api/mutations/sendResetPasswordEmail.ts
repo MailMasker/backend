@@ -6,9 +6,11 @@ import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createPasswordResetRequest } from "../../dal/createPasswordResetRequest";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { userByID } from "../../dal/userByID";
 import { userByUsername } from "../../dal/userByUsername";
 import { v4 as uuid } from "uuid";
 import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
+import { visit } from "graphql";
 
 dayjs.extend(relativeTime);
 
@@ -28,14 +30,7 @@ export const sendResetPasswordEmail = async (
     const user = await userByUsername(context.dalContext, {
       username: args.usernameOrEmail,
     });
-    const verifiedEmailsForUser = await Promise.all(
-      user.verifiedEmailIDs.map((id) =>
-        verifiedEmailByID(context.dalContext, id)
-      )
-    );
-    destinationEmails = verifiedEmailsForUser
-      .filter(({ deleted }) => !deleted)
-      .map(({ email }) => email);
+    userID = user.id;
   } catch (err) {
     if (err instanceof NotFoundError) {
       try {
@@ -43,7 +38,14 @@ export const sendResetPasswordEmail = async (
           context.dalContext,
           { email: args.usernameOrEmail }
         );
-        destinationEmails = [verifiedEmails[0].email];
+        if (verifiedEmails.length > 0) {
+          console.error(
+            `unexpectedly verifiedEmails.length > 0 – IDs are: ${verifiedEmails
+              .map((ve) => ve.id)
+              .join(", ")}`
+          );
+        }
+        userID = verifiedEmails[0].ownerUserID;
       } catch (e) {
         if (err instanceof NotFoundError) {
           throw new Error(
@@ -56,14 +58,25 @@ export const sendResetPasswordEmail = async (
     }
   }
 
-  if (destinationEmails.length === 0) {
-    throw new Error(
-      "We weren't able to find any usernames and/or verified email addresses based on what you entered"
-    );
-  }
   if (!userID) {
     throw new Error(
       "We weren't able to find any users based on what you entered"
+    );
+  }
+
+  const user = await userByID(context.dalContext, userID);
+
+  const verifiedEmailsForUser = await Promise.all(
+    user.verifiedEmailIDs.map((id) => verifiedEmailByID(context.dalContext, id))
+  );
+
+  destinationEmails = verifiedEmailsForUser
+    .filter(({ deleted }) => !deleted)
+    .map(({ email }) => email);
+
+  if (destinationEmails.length === 0) {
+    throw new Error(
+      "We weren't able to find any usernames and/or verified email addresses based on what you entered"
     );
   }
 
@@ -79,46 +92,52 @@ export const sendResetPasswordEmail = async (
     verificationCode
   );
 
-  await Promise.all(
-    destinationEmails.map((email) => {
-      const params = {
-        Destination: {
-          ToAddresses: [email],
-        },
-        Message: {
-          Body: {
-            Html: {
+  if (process.env.S_STAGE !== "local") {
+    await Promise.all(
+      destinationEmails.map((email) => {
+        const params = {
+          Destination: {
+            ToAddresses: [email],
+          },
+          Message: {
+            Body: {
+              Html: {
+                Charset: "UTF-8",
+                Data: `<p>Your username is ${user.username}</p><p><a href="${
+                  process.env.WEB_APP_BASE_URL
+                }/reset-password/${
+                  args.usernameOrEmail
+                }/code/${verificationCode}/username/${
+                  user.username
+                }">Click here</a> to choose a new password (${email}).</p><p>This link expires ${dayjs().to(
+                  dayjs(expiresISO)
+                )}, and has been sent to all of the verified email addresses on your account.</p>`,
+              },
+            },
+            Subject: {
               Charset: "UTF-8",
-              Data: `<a href="${process.env.WEB_APP_BASE_URL}/reset-password/${
-                args.usernameOrEmail
-              }/code/${verificationCode}">Click here</a> to verify your email address (${email}). This link expires ${dayjs().to(
-                dayjs(expiresISO)
-              )}.`,
+              Data: "[Mail Masker] Reset your password",
             },
           },
-          Subject: {
-            Charset: "UTF-8",
-            Data: "[Mail Masker] Reset your password",
-          },
-        },
-        // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
-        Source: `support@${SupportedMailDomains[0]}`,
-      };
+          // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
+          Source: `support@${SupportedMailDomains[0]}`,
+        };
 
-      // Create the promise and SES service object
-      const sendPromise = context.ses.sendEmail(params).promise();
+        // Create the promise and SES service object
+        const sendPromise = context.ses.sendEmail(params).promise();
 
-      // Handle promise's fulfilled/rejected states
-      return sendPromise
-        .then(function(data) {
-          console.debug(data.MessageId);
-        })
-        .catch(function(err) {
-          console.error(err, err.stack);
-          throw new Error("We were unable to send a password reset email");
-        });
-    })
-  );
+        // Handle promise's fulfilled/rejected states
+        return sendPromise
+          .then(function(data) {
+            console.debug(data.MessageId);
+          })
+          .catch(function(err) {
+            console.error(err, err.stack);
+            throw new Error("We were unable to send a password reset email");
+          });
+      })
+    );
+  }
 
   return true;
 };
