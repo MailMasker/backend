@@ -71,12 +71,12 @@ export const resetPassword = async (
                 Body: {
                   Html: {
                     Charset: "UTF-8",
-                    Data: `Your password has been reset. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
+                    Data: `Your password has been changed. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
                   },
                 },
                 Subject: {
                   Charset: "UTF-8",
-                  Data: "[Mail Masker] Reset your password",
+                  Data: "[Mail Masker] Your password has been changed",
                 },
               },
               // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
