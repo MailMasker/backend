@@ -44,6 +44,8 @@ export type Mutation = {
   createEmailMask: EmailMask,
   createRoute: Route,
   updateRoute: Route,
+  sendResetPasswordEmail?: Maybe<Scalars['Boolean']>,
+  resetPassword?: Maybe<Scalars['Boolean']>,
   verifyEmailWithCode: VerifiedEmail,
 };
 
@@ -91,7 +93,20 @@ export type MutationCreateRouteArgs = {
 export type MutationUpdateRouteArgs = {
   id: Scalars['ID'],
   redirectToVerifiedEmailID?: Maybe<Scalars['ID']>,
-  expiresISO?: Maybe<Scalars['String']>
+  expiresISO?: Maybe<Scalars['String']>,
+  clearExpiresISO?: Maybe<Scalars['Boolean']>
+};
+
+
+export type MutationSendResetPasswordEmailArgs = {
+  usernameOrEmail: Scalars['String']
+};
+
+
+export type MutationResetPasswordArgs = {
+  newPassword: Scalars['String'],
+  code: Scalars['String'],
+  userID: Scalars['String']
 };
 
 
@@ -261,6 +276,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'raw'>>,
   createRoute?: Resolver<ResolversTypes['Route'], ParentType, ContextType, RequireFields<MutationCreateRouteArgs, 'redirectToVerifiedEmailID' | 'emailMaskID'>>,
   updateRoute?: Resolver<ResolversTypes['Route'], ParentType, ContextType, RequireFields<MutationUpdateRouteArgs, 'id'>>,
+  sendResetPasswordEmail?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSendResetPasswordEmailArgs, 'usernameOrEmail'>>,
+  resetPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'newPassword' | 'code' | 'userID'>>,
   verifyEmailWithCode?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationVerifyEmailWithCodeArgs, 'email' | 'code'>>,
 }>;
 

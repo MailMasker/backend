@@ -78,7 +78,11 @@ type Mutation {
     id: ID!
     redirectToVerifiedEmailID: ID
     expiresISO: String
+    clearExpiresISO: Boolean
   ): Route!
+
+  sendResetPasswordEmail(usernameOrEmail: String!): Boolean
+  resetPassword(newPassword: String!, code: String!, userID: String!): Boolean
 
   verifyEmailWithCode(email: String!, code: String!): VerifiedEmail!
 }

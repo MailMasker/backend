@@ -59,6 +59,7 @@ export const updateRoute = async (
       {
         redirectToVerifiedEmailID: args.redirectToVerifiedEmailID,
         expiresISO: args.expiresISO,
+        clearExpiresISO: args.clearExpiresISO,
       },
       {
         route: routePreUpdate,
