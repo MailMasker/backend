@@ -33,11 +33,19 @@ provider:
       Resource: "arn:aws:dynamodb:us-east-1:${self:custom.AWS_ACCOUNT.${self:provider.stage}}:table/*"
 
 plugins:
-  - serverless-plugin-typescript
+  - serverless-webpack
   - serverless-offline
   - serverless-domain-manager
 
 custom:
+  webpack:
+    webpackConfig: "webpack.config.js"
+    keepOutputDirectory: true
+    packager: "yarn"
+    includeModules: true
+    packagerOptions:
+      scripts:
+        - rm -rf node_modules/aws-sdk
   JWT_SECRET: ${file(jwt_secret.txt)}
   WEB_APP_BASE_URL:
     local: https://localhost:4200
@@ -116,6 +124,7 @@ functions:
       S_STAGE: ${self:provider.stage}
       MAIL_DOMAINS: ${self:custom.MAIL_DOMAINS.${self:provider.stage}}
       DAL_ENVIRONMENT: email-forwarder
+      BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
 
   playground:
     handler: playground-handler.handler

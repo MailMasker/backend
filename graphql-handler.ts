@@ -10,6 +10,8 @@ import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 import AWS from "aws-sdk";
 // @ts-ignore
 import { ApolloServer } from "apollo-server-express";
+import Bugsnag from "@bugsnag/js";
+import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import { DALContext } from "./src/dal/DALContext";
 import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
@@ -27,12 +29,20 @@ import { me } from "./src/api/queries/me";
 import { redirectToVerifiedEmail } from "./src/api/objects/redirectToVerifiedEmail";
 import { resendVerificationEmail } from "./src/api/mutations/resendVerificationEmail";
 import { resetPassword } from "./src/api/mutations/resetPassword";
+// @ts-ignore – this file is loaded via the raw-loader in webpack.config.js
+import schema from "./src/api/schema/schema.graphql";
 import { sendResetPasswordEmail } from "./src/api/mutations/sendResetPasswordEmail";
 import serverless from "serverless-http";
 import { unauthenticate } from "./src/api/mutations/unauthenticate";
 import { updateRoute } from "./src/api/mutations/updateRoute";
 import { user } from "./src/api/objects/user";
 import { verifyEmailWithCode } from "./src/api/mutations/verifyEmailWithCode";
+
+Bugsnag.start({
+  apiKey: "3e593a7f71377ef86cf65c7cda2570db",
+  plugins: [BugsnagPluginExpress],
+  releaseStage: process.env.BUGSNAG_RELEASE_STAGE,
+});
 
 if (!process.env.WEB_APP_BASE_URL) {
   throw new Error("missing process.env.WEB_APP_BASE_URL");
@@ -89,11 +99,6 @@ const mutationResolvers: MutationResolvers = {
 
   verifyEmailWithCode,
 };
-
-const schema = fs.readFileSync(
-  path.join(__dirname, "./src/api/schema/schema.graphql"),
-  "utf8"
-);
 
 const apollo = new ApolloServer({
   typeDefs: schema,
@@ -156,6 +161,11 @@ const apollo = new ApolloServer({
 
 const app = express();
 
+// This must be the first piece of middleware in the stack.
+// It can only capture errors in downstream middleware
+const middleware = Bugsnag.getPlugin("express");
+app.use(middleware.requestHandler);
+
 app.use(cookieParser());
 
 const allowedOrigins: string[] = [
@@ -174,6 +184,9 @@ apollo.applyMiddleware({
     methods: "POST",
   },
 });
+
+// This handles any errors that Express catches – it seems like it should be last?
+app.use(middleware.errorHandler);
 
 const handler = serverless(app);
 
