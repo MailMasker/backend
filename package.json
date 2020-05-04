@@ -3,7 +3,7 @@
     "test": "jest",
     "dynamo-local": "cd ./local/dynamodb/ && java -Djava.library.path=./ -jar DynamoDBLocal.jar -sharedDb",
     "generate": "rm -rf .build && graphql-codegen --config codegen.yml",
-    "start": "export SLS_DEBUG=* && node --inspect ./node_modules/.bin/serverless offline --stage=local --httpsProtocol=./ --httpPort=4201",
+    "start": "SLS_DEBUG=* node --inspect ./node_modules/.bin/serverless offline --stage=local --httpsProtocol=./ --httpPort=4201",
     "offline-show-response": "sls offline --printOutput",
     "deploy-dev": "./deploy-dev.sh",
     "gencerts": "mkcert localhost 127.0.0.1",
