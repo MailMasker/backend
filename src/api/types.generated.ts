@@ -119,6 +119,7 @@ export type Query = {
    __typename?: 'Query',
   me: Me,
   ping: Scalars['String'],
+  exportData: Scalars['String'],
 };
 
 export type Route = {
@@ -284,6 +285,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  exportData?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
 export type RouteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Route'] = ResolversParentTypes['Route']> = ResolversObject<{

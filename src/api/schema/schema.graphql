@@ -50,6 +50,7 @@ type VerifiedEmail {
 type Query {
   me: Me!
   ping: String!
+  exportData: String!
 }
 
 type Mutation {

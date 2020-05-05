@@ -23,6 +23,7 @@ import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
 import { emailMask } from "./src/api/objects/emailMask";
 import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
+import { exportData } from "./src/api/queries/exportData";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
@@ -75,6 +76,7 @@ const queryResolvers: QueryResolvers = {
     return "pong";
   },
   me: combineResolvers(authenticated, me),
+  exportData: combineResolvers(authenticated, exportData),
 };
 
 const mutationResolvers: MutationResolvers = {
