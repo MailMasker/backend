@@ -15,8 +15,14 @@ export const updateRoute = async (
   context: AuthenticatedResolverContext,
   info
 ) => {
-  if (!args.expiresISO && !args.redirectToVerifiedEmailID) {
-    throw new Error("nothing to update");
+  if (
+    !args.expiresISO &&
+    !args.redirectToVerifiedEmailID &&
+    (args.clearExpiresISO === undefined || args.clearExpiresISO === null)
+  ) {
+    throw new Error(
+      "We couldn't perform the update because we didn't find anything to update"
+    );
   }
 
   const { currentUser } = await ensureAuthenticated(context);
