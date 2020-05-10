@@ -18,19 +18,19 @@ export const resetPassword = async (
     throw new Error("missing code, new password, or user ID");
   }
 
-  const { resetPasswordRequests } = await userByID(
+  const { passwordResetRequests } = await userByID(
     context.dalContext,
     args.userID
   );
 
-  if (resetPasswordRequests.length === 0) {
+  if (passwordResetRequests.length === 0) {
     throw new Error("no password reset request was found");
   }
 
   let foundMatchingCode = false;
   let foundDestionationEmail = false;
-  for (let i = 0; i < resetPasswordRequests.length; i++) {
-    const request = resetPasswordRequests[i];
+  for (let i = 0; i < passwordResetRequests.length; i++) {
+    const request = passwordResetRequests[i];
     if (request.code === args.code) {
       foundMatchingCode = true;
       if (!dayjs().isBefore(dayjs(request.expiresISO))) {
@@ -49,6 +49,7 @@ export const resetPassword = async (
 
       await updateUser(context.dalContext, userPreUpdate.id, {
         password: args.newPassword,
+        clearAllPasswordResetRequests: true,
       });
       if (destinationEmails.length === 0) {
         console.error(

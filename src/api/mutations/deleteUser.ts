@@ -1,5 +1,8 @@
+import { AuthenticationError, UserInputError } from "apollo-server-core";
+
+import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { NotFoundError } from "../../dal";
-import { UserInputError } from "apollo-server-core";
+import { UnPromisify } from "../../dal/lib/UnPromisify";
 import bcrypt from "bcryptjs";
 import dayjs from "dayjs";
 import { deleteAllAuthTokensForUserID } from "../../dal/deleteAllAuthTokensForUserID";
@@ -12,9 +15,15 @@ import { v4 as uuid } from "uuid";
 export const deleteUser = async (
   parent,
   args,
-  { clearAuthCookie, dalContext, currentUserID },
+  { clearAuthCookie, dalContext, currentUserID }: AuthenticatedResolverContext,
   info
 ) => {
+  if (!currentUserID) {
+    throw new AuthenticationError(
+      "You must be logged-in to delete your account."
+    );
+  }
+
   const user = await userByID(dalContext, currentUserID);
 
   if (!bcrypt.compareSync(args.password, user.passwordHash)) {
@@ -23,27 +32,33 @@ export const deleteUser = async (
 
   const dataBeforeDeletion = await exportData(dalContext, currentUserID);
 
-  const scrambledUsername = uuid();
+  let scrambledUsername = uuid();
 
   // Ensure this scrambled username isn't taken (and try again a couple of times, if so)
-  try {
-    let user: any;
-    for (let i = 0; i < 3; i++) {
+  let existingUserWithNewUsername:
+    | UnPromisify<ReturnType<typeof userByUsername>>
+    | undefined;
+  for (let i = 0; i < 3; i++) {
+    try {
+      scrambledUsername = uuid();
       // A NotFoundError should be thrown, unless the user is already taken
-      user = userByUsername(dalContext, { username: scrambledUsername });
+      existingUserWithNewUsername = await userByUsername(dalContext, {
+        username: scrambledUsername,
+      });
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        // This is the expected case
+        break;
+      } else {
+        throw err;
+      }
     }
-    if (user) {
-      // We should never encounter this code path
-      throw new Error(
-        "We experienced an error prior to deleting your account. The account has not been deleted."
-      );
-    }
-  } catch (err) {
-    if (err instanceof NotFoundError) {
-      // This is the expected case
-    } else {
-      throw err;
-    }
+  }
+  if (existingUserWithNewUsername) {
+    // We should never encounter this code path
+    throw new Error(
+      "We experienced an error prior to deleting your account. The account has not been deleted."
+    );
   }
 
   await updateUser(dalContext, currentUserID, {

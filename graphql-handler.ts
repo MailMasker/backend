@@ -1,6 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
-
 import {
   AuthenticatedResolverContext,
   ResolverContext,
@@ -21,6 +18,7 @@ import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
 import { createVerifiedEmail } from "./src/api/mutations/createVerifiedEmail";
+import { deleteUser } from "./src/api/mutations/deleteUser";
 import { emailMask } from "./src/api/objects/emailMask";
 import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import { exportData } from "./src/api/queries/exportData";
@@ -84,6 +82,7 @@ const mutationResolvers: MutationResolvers = {
   unauthenticate: combineResolvers(authenticated, unauthenticate),
 
   createUser,
+  deleteUser: combineResolvers(authenticated, deleteUser),
 
   createVerifiedEmail: combineResolvers(authenticated, createVerifiedEmail),
   resendVerificationEmail: combineResolvers(
@@ -151,8 +150,7 @@ const apollo = new ApolloServer({
         });
       },
       clearAuthCookie: () => {
-        // NOTE: since we have HttpOnly cookies, we can't delete them
-        // res.clearCookie("jwt");
+        res.clearCookie("jwt");
       },
       authToken,
       ses: new AWS.SES({ apiVersion: "2010-12-01" }),
