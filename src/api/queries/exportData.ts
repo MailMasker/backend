@@ -1,10 +1,13 @@
-import { ResolversTypes } from "../types.generated";
+import { emailMaskByID, routesByIDs, verifiedEmailByID } from "../../dal";
 
-export const exportData: ResolversTypes["exportData"] = (
+import { ResolversTypes } from "../types.generated";
+import { exportData as dalExportData } from "../../dal/exportData";
+
+export const exportData: ResolversTypes["exportData"] = async (
   parent,
   args,
   { dalContext, currentUserID },
   info
-) => {
-  return "exported!";
+): Promise<string> => {
+  return dalExportData(dalContext, currentUserID);
 };

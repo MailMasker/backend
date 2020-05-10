@@ -11,7 +11,9 @@ type Route {
 }
 
 type DeleteUserPayload {
-  authToken: String
+  scrambledUsername: String!
+  dataBeforeDeletion: String!
+  dataAfterDeletion: String!
 }
 
 # Once created, an EmailMask is reserved forever so that it cannot be used by another user
@@ -63,6 +65,7 @@ type Mutation {
     password: String!
     uuid: String!
   ): CreateUserPayload!
+  deleteUser(password: String!): DeleteUserPayload!
 
   createVerifiedEmail(email: String!): VerifiedEmail!
   resendVerificationEmail(email: String!): VerifiedEmail!

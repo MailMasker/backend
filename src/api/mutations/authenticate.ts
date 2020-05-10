@@ -4,6 +4,7 @@ import { UserInputError } from "apollo-server-express";
 import bcrypt from "bcryptjs";
 import { createAuthToken } from "../../dal/createAuthToken";
 import jwt from "jsonwebtoken";
+import { updateUser } from "../../dal/updateUser";
 import { userByUsername } from "../../dal/userByUsername";
 
 // TODO: implement rate limiting
@@ -18,7 +19,17 @@ export const authenticate = async (
     console.debug("getting user for username: ", args.username);
     const user = await userByUsername(dalContext, { username: args.username });
 
-    console.debug("userfound: ", user);
+    if (user.deletedISO) {
+      await updateUser(dalContext, user.id, {
+        deletedISO: null,
+      });
+
+      console.log(
+        `user ${user.id} was automatically marked undeleted after logging in`
+      );
+    }
+
+    console.debug("user found: ", user);
 
     if (!bcrypt.compareSync(args.password, user.passwordHash)) {
       throw new UserInputError("Password mismatch");
