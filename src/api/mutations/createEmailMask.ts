@@ -7,6 +7,8 @@ import { EmailMask } from "../types.generated";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
 
+const aliasRegex = /^[a-z0-9]+$/i;
+
 export const createEmailMask = async (
   parent,
   { raw, parentEmailMaskID },
@@ -24,9 +26,15 @@ export const createEmailMask = async (
     email: raw,
   });
 
+  if (!aliasRegex.test(alias)) {
+    throw new UserInputError(
+      `We currently only support letters and numbers in the alias of your Mail Mask, as other characters are reserved for future functionality.")`
+    );
+  }
+
   if (!SupportedMailDomains.includes(domain)) {
     throw new UserInputError(
-      `The domain specified, ${domain} isn't one that we support`
+      `The domain specified (${domain}) isn't one that we support.`
     );
   }
 
