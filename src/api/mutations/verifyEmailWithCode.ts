@@ -33,14 +33,22 @@ export const verifyEmailWithCode = async (
     // Look up all routes that have this email address and send the intro email
     const user = await userByID(dalContext, verifiedEmail.ownerUserID);
     await Promise.all(
-      user.emailMaskIDs.map((emailMaskID) =>
-        dal.emailMaskByID(dalContext, emailMaskID).then((emailMask) =>
-          sendTransactionalEmail(ses, {
-            to: [`${emailMask.alias}@${emailMask.domain}`],
-            subject: `[Mail Masker] Your new Mail Mask, ${emailMask.alias}@${emailMask.domain}, is now active!`,
-            bodyHTML: `Emails received at ${emailMask.alias}@${emailMask.domain} (such as this one) will be forwarded to ${verifiedEmail.email}.`,
-          })
-        )
+      user.routeIDs.map((routeID) =>
+        dal.routesByIDs(dalContext, [routeID]).then(([route]) => {
+          if (route.redirectToVerifiedEmailID === verifiedEmail.id) {
+            return dal
+              .emailMaskByID(dalContext, route.emailMaskID)
+              .then((emailMask) =>
+                sendTransactionalEmail(ses, {
+                  to: [`${emailMask.alias}@${emailMask.domain}`],
+                  subject: `[Mail Masker] Your new Mail Mask, ${emailMask.alias}@${emailMask.domain}, is now active!`,
+                  bodyHTML: `Emails received at ${emailMask.alias}@${emailMask.domain} (such as this one) will be forwarded to ${verifiedEmail.email}.`,
+                })
+              );
+          } else {
+            return Promise.resolve();
+          }
+        })
       )
     );
   }
