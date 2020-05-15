@@ -2,6 +2,9 @@ import * as dal from "../../dal/createVerifiedEmail";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { NotFoundError } from "../../dal";
+import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
+import { UserInputError } from "apollo-server-core";
+import { deconstructExternalEmail } from "../../dal/lib/deconstructExternalEmail";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
@@ -18,6 +21,17 @@ export const createVerifiedEmail = async (
   if (!currentUserID) {
     throw new Error("Must be signed in");
   }
+
+  const { domain } = deconstructExternalEmail({ email: args.email });
+  if (
+    SupportedMailDomains.includes(domain) ||
+    domain.toLowerCase().includes("mailmasker") // Protect against dev environment being used as well
+  ) {
+    throw new UserInputError(
+      "We don't support using a Mail Mask as a Verified Email address."
+    );
+  }
+
   let existingVerifiedEmail;
   try {
     existingVerifiedEmail = await verifiedEmailByEmail(dalContext, {
