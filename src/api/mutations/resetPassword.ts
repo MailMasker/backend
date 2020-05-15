@@ -3,6 +3,7 @@ import { MutationResetPasswordArgs } from "../types.generated";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createAuthToken } from "../../dal/createAuthToken";
 import dayjs from "dayjs";
+import { deleteAllAuthTokensForUserID } from "../../dal/deleteAllAuthTokensForUserID";
 import jwt from "jsonwebtoken";
 import { updateUser } from "../../dal/updateUser";
 import { userByID } from "../../dal/userByID";
@@ -101,6 +102,10 @@ export const resetPassword = async (
           })
         );
       }
+
+      await deleteAllAuthTokensForUserID(context.dalContext, {
+        userID: userPreUpdate.id,
+      });
 
       const authToken = jwt.sign(
         { username: userPreUpdate.username, userID: userPreUpdate.id },
