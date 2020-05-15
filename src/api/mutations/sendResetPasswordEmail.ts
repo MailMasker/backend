@@ -1,11 +1,13 @@
 import { NotFoundError, verifiedEmailByID } from "../../dal";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import Bugsnag from "@bugsnag/js";
 import { MutationSendResetPasswordEmailArgs } from "../types.generated";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createPasswordResetRequest } from "../../dal/createPasswordResetRequest";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
 import { userByID } from "../../dal/userByID";
 import { userByUsername } from "../../dal/userByUsername";
 import { v4 as uuid } from "uuid";
@@ -93,52 +95,30 @@ export const sendResetPasswordEmail = async (
   );
 
   if (process.env.S_STAGE !== "local") {
-    await Promise.all(
-      destinationEmails.map((email) => {
-        const params = {
-          Destination: {
-            ToAddresses: [email],
-          },
-          Message: {
-            Body: {
-              Html: {
-                Charset: "UTF-8",
-                Data: `<p>Your username is ${user.username}</p><p><a href="${
-                  process.env.WEB_APP_BASE_URL
-                }/reset-password/user/${
-                  user.id
-                }/code/${verificationCode}/username/${
-                  user.username
-                }">Click here</a> to choose a new password (${email}).</p><p>This link expires ${dayjs().to(
-                  dayjs(expiresISO)
-                )}, and has been sent to all of the verified email addresses on your account.</p>`,
-              },
-            },
-            Subject: {
-              Charset: "UTF-8",
-              Data: "[Mail Masker] Reset your password",
-            },
-          },
-          // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
-          Source: `support@${SupportedMailDomains[0]}`,
-        };
-
-        // Create the promise and SES service object
-        const sendPromise = context.ses.sendEmail(params).promise();
-
-        // Handle promise's fulfilled/rejected states
-        return sendPromise
-          .then(function(data) {
-            console.debug(data.MessageId);
+    try {
+      await Promise.all(
+        destinationEmails.map((email) =>
+          sendTransactionalEmail(context.ses, {
+            to: [email],
+            subject: "[Mail Masker] Reset your password",
+            bodyHTML: `<p>Your username is ${user.username}</p><p><a href="${
+              process.env.WEB_APP_BASE_URL
+            }/reset-password/user/${
+              user.id
+            }/code/${verificationCode}/username/${
+              user.username
+            }">Click here</a> to choose a new password (${email}).</p><p>This link expires ${dayjs().to(
+              dayjs(expiresISO)
+            )}, and has been sent to all of the verified email addresses on your account.</p>`,
           })
-          .catch(function(err) {
-            console.error(err, err.stack);
-            throw new Error(
-              "We were unable to send one or more password reset emails"
-            );
-          });
-      })
-    );
+        )
+      );
+    } catch (err) {
+      Bugsnag.notify(err);
+      throw new Error(
+        "We had some trouble sending one or more password reset emails. Please try again."
+      );
+    }
   }
 
   return true;

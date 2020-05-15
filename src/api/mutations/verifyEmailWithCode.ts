@@ -18,7 +18,7 @@ export const verifyEmailWithCode = async (
 
   const verifiedEmail = await dal.verifyCodeForVerifiedEmail(dalContext, {
     verificationCode: code,
-    verifiedEmailEmail: email
+    verifiedEmailEmail: email,
   });
 
   if (!verifiedEmail.verified) {
@@ -27,9 +27,14 @@ export const verifyEmailWithCode = async (
     );
   }
 
+  if (verifiedEmail.verified) {
+    // Look up all routes that have this email address and send the intro email
+    // verifiedEmail.ownerUserID
+  }
+
   return {
     id: verifiedEmail.id,
     email: verifiedEmail.email,
-    verified: verifiedEmail.verified
+    verified: verifiedEmail.verified,
   };
 };

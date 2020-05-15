@@ -1,6 +1,7 @@
 import * as dal from "../../dal/createVerifiedEmail";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import Bugsnag from "@bugsnag/js";
 import { NotFoundError } from "../../dal";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
@@ -63,10 +64,17 @@ export const createVerifiedEmail = async (
   });
 
   if (process.env.S_STAGE !== "local") {
-    await sendVerificationEmail(ses, {
-      verificationCode: response.verificationCode,
-      email: response.email,
-    });
+    try {
+      await sendVerificationEmail(ses, {
+        verificationCode: response.verificationCode,
+        email: response.email,
+      });
+    } catch (err) {
+      Bugsnag.notify(err);
+      throw new Error(
+        "We had some trouble sending you the verification email. Please try again."
+      );
+    }
   }
 
   return response;

@@ -1,10 +1,12 @@
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import Bugsnag from "@bugsnag/js";
 import { MutationResetPasswordArgs } from "../types.generated";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createAuthToken } from "../../dal/createAuthToken";
 import dayjs from "dayjs";
 import { deleteAllAuthTokensForUserID } from "../../dal/deleteAllAuthTokensForUserID";
 import jwt from "jsonwebtoken";
+import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
 import { updateUser } from "../../dal/updateUser";
 import { userByID } from "../../dal/userByID";
 import { verifiedEmailByID } from "../../dal";
@@ -63,44 +65,22 @@ export const resetPassword = async (
       }
 
       if (process.env.S_STAGE !== "local") {
-        await Promise.all(
-          destinationEmails.map((email) => {
-            const params = {
-              Destination: {
-                ToAddresses: [email],
-              },
-              Message: {
-                Body: {
-                  Html: {
-                    Charset: "UTF-8",
-                    Data: `Your password has been changed. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
-                  },
-                },
-                Subject: {
-                  Charset: "UTF-8",
-                  Data: "[Mail Masker] Your password has been changed",
-                },
-              },
-              // NOTE: if this gets updated, also update the place in the web app where we reference this email address by searching that project for "support@"
-              Source: `support@${SupportedMailDomains[0]}`,
-            };
-
-            // Create the promise and SES service object
-            const sendPromise = context.ses.sendEmail(params).promise();
-
-            // Handle promise's fulfilled/rejected states
-            return sendPromise
-              .then(function(data) {
-                console.debug(data.MessageId);
+        try {
+          await Promise.all(
+            destinationEmails.map((email) =>
+              sendTransactionalEmail(context.ses, {
+                to: [email],
+                subject: "[Mail Masker] Your password has been changed",
+                bodyHTML: `Your password has been changed. If you did not do this, and believe your account has been compromised, please respond to this email immediately.`,
               })
-              .catch(function(err) {
-                console.error(err, err.stack);
-                throw new Error(
-                  "We were unable to send a password reset email"
-                );
-              });
-          })
-        );
+            )
+          );
+        } catch (err) {
+          Bugsnag.notify(err);
+          throw new Error(
+            "We had some trouble sending you the password reset email. Please try again."
+          );
+        }
       }
 
       await deleteAllAuthTokensForUserID(context.dalContext, {

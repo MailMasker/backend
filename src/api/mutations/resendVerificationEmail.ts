@@ -1,4 +1,5 @@
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import Bugsnag from "@bugsnag/js";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
@@ -21,10 +22,17 @@ export const resendVerificationEmail = async (
   });
 
   if (process.env.S_STAGE !== "local") {
-    await sendVerificationEmail(ses, {
-      email: existingVerifiedEmail.email,
-      verificationCode: existingVerifiedEmail.verificationCode,
-    });
+    try {
+      await sendVerificationEmail(ses, {
+        email: existingVerifiedEmail.email,
+        verificationCode: existingVerifiedEmail.verificationCode,
+      });
+    } catch (err) {
+      Bugsnag.notify(err);
+      throw new Error(
+        "We had some trouble resending you the verification email. Please try again."
+      );
+    }
   }
 
   return existingVerifiedEmail;

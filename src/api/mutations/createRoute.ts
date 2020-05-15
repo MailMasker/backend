@@ -3,8 +3,11 @@ import * as dal from "../../dal/";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
+import Bugsnag from "@bugsnag/js";
 import { EmailMaskInUseInRouteError } from "../../dal/createRoute";
 import { ensureAuthenticated } from "../lib/ensureAuthenticated";
+import { redirectToVerifiedEmail } from "../objects/redirectToVerifiedEmail";
+import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
 
 export const createRoute = async (
   parent,
@@ -45,17 +48,29 @@ export const createRoute = async (
         emailMaskID: args.emailMaskID,
       }
     );
+
+    if (verifiedEmail.verified) {
+      // Send intro email to new Mail Mask
+      try {
+        await sendTransactionalEmail(context.ses, {
+          to: [`${emailMask.alias}@${emailMask.domain}`],
+          subject: `[Mail Masker] Your new Mail Mask, ${emailMask.alias}@${emailMask.domain}, is now active!`,
+          bodyHTML: `Emails received at ${emailMask.alias}@${emailMask.domain} (such as this one) will be forwarded to ${redirectToVerifiedEmail.email}.`,
+        });
+      } catch (err) {
+        Bugsnag.notify(err);
+      }
+    }
+
     return {
-      id: route.id,
+      ...route,
       emailMask,
-      expiresISO: route.expiresISO,
-      disabled: false,
       redirectToVerifiedEmail: verifiedEmail,
     };
   } catch (err) {
     if (err instanceof EmailMaskInUseInRouteError) {
       throw new UserInputError(
-        "The email mask you've chosen is already being used in another route"
+        "The email mask you've chosen is already being used"
       );
     }
     throw err;
