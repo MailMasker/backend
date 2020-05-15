@@ -47,15 +47,15 @@ export const authenticate = async (
     const { secondsUntilExpiry } = await createAuthToken(
       dalContext,
       authToken,
-      user.id
+      user.id,
+      args.persistent
     );
 
     setAuthCookie({ authToken, secondsUntilExpiry });
 
     return true;
   } catch (error) {
-    throw new UserInputError(
-      "User with username provided could not be found or the password you provided doesn't match"
-    );
+    console.error(error);
+    throw new UserInputError("Invalid username or incorrect password");
   }
 };

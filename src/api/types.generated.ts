@@ -17,7 +17,9 @@ export type CreateUserPayload = {
 
 export type DeleteUserPayload = {
    __typename?: 'DeleteUserPayload',
-  authToken?: Maybe<Scalars['String']>,
+  scrambledUsername: Scalars['String'],
+  dataBeforeDeletion: Scalars['String'],
+  dataAfterDeletion: Scalars['String'],
 };
 
 export type EmailMask = {
@@ -39,6 +41,7 @@ export type Mutation = {
   authenticate?: Maybe<Scalars['Boolean']>,
   unauthenticate?: Maybe<Scalars['Boolean']>,
   createUser: CreateUserPayload,
+  deleteUser: DeleteUserPayload,
   createVerifiedEmail: VerifiedEmail,
   resendVerificationEmail: VerifiedEmail,
   createEmailMask: EmailMask,
@@ -52,7 +55,8 @@ export type Mutation = {
 
 export type MutationAuthenticateArgs = {
   username: Scalars['String'],
-  password: Scalars['String']
+  password: Scalars['String'],
+  persistent: Scalars['Boolean']
 };
 
 
@@ -64,7 +68,13 @@ export type MutationUnauthenticateArgs = {
 export type MutationCreateUserArgs = {
   username: Scalars['String'],
   password: Scalars['String'],
-  uuid: Scalars['String']
+  uuid: Scalars['String'],
+  persistent: Scalars['Boolean']
+};
+
+
+export type MutationDeleteUserArgs = {
+  password: Scalars['String']
 };
 
 
@@ -253,7 +263,9 @@ export type CreateUserPayloadResolvers<ContextType = any, ParentType extends Res
 }>;
 
 export type DeleteUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['DeleteUserPayload'] = ResolversParentTypes['DeleteUserPayload']> = ResolversObject<{
-  authToken?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
+  scrambledUsername?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  dataBeforeDeletion?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  dataAfterDeletion?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
 }>;
 
 export type EmailMaskResolvers<ContextType = any, ParentType extends ResolversParentTypes['EmailMask'] = ResolversParentTypes['EmailMask']> = ResolversObject<{
@@ -269,9 +281,10 @@ export type MeResolvers<ContextType = any, ParentType extends ResolversParentTyp
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  authenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'username' | 'password'>>,
+  authenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'username' | 'password' | 'persistent'>>,
   unauthenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, MutationUnauthenticateArgs>,
-  createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid'>>,
+  createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid' | 'persistent'>>,
+  deleteUser?: Resolver<ResolversTypes['DeleteUserPayload'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'password'>>,
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
   resendVerificationEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationResendVerificationEmailArgs, 'email'>>,
   createEmailMask?: Resolver<ResolversTypes['EmailMask'], ParentType, ContextType, RequireFields<MutationCreateEmailMaskArgs, 'raw'>>,

@@ -139,7 +139,7 @@ const apollo = new ApolloServer({
       setAuthCookie: ({ authToken, secondsUntilExpiry }) => {
         res.cookie("jwt", authToken, {
           httpOnly: true,
-          maxAge: secondsUntilExpiry,
+          ...(secondsUntilExpiry ? { maxAge: secondsUntilExpiry } : {}),
           // TODO: turn this on for prod eventually
           //secure: true, //on HTTPS
           domain: process.env.API_DOMAIN,

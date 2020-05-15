@@ -56,7 +56,11 @@ type Query {
 }
 
 type Mutation {
-  authenticate(username: String!, password: String!): Boolean
+  authenticate(
+    username: String!
+    password: String!
+    persistent: Boolean!
+  ): Boolean
   # Token is optional because the server will first attempt to read the token from a cookie, if present
   unauthenticate(token: String): Boolean
 
@@ -64,6 +68,7 @@ type Mutation {
     username: String!
     password: String!
     uuid: String!
+    persistent: Boolean!
   ): CreateUserPayload!
   deleteUser(password: String!): DeleteUserPayload!
 

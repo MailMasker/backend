@@ -110,7 +110,9 @@ export const resetPassword = async (
       const { secondsUntilExpiry } = await createAuthToken(
         context.dalContext,
         authToken,
-        userPreUpdate.id
+        userPreUpdate.id,
+        // "Remember Me" is considered unchecked, since there was no UI to check it
+        false
       );
 
       context.setAuthCookie({ authToken, secondsUntilExpiry });
