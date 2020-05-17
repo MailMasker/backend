@@ -9,5 +9,6 @@ export const exportData: ResolversTypes["exportData"] = async (
   { dalContext, currentUserID },
   info
 ): Promise<string> => {
-  return dalExportData(dalContext, currentUserID);
+  const exportedData = dalExportData(dalContext, currentUserID);
+  return JSON.stringify(exportedData);
 };
