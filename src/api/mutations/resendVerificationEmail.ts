@@ -27,6 +27,7 @@ export const resendVerificationEmail = async (
         email: existingVerifiedEmail.email,
         verificationCode: existingVerifiedEmail.verificationCode,
       });
+      console.log("verification email sent");
     } catch (err) {
       Bugsnag.notify(err);
       throw new Error(

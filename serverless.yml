@@ -63,6 +63,10 @@ custom:
     local: localhost
     dev: api.mailmasker-dev.com
     prod: api.mailmasker.com
+  ASSETS_BASE_URL:
+    local: https://localhost:4202/transactional-email # we don't yet run the marketing site locally, so this is not valid
+    dev: https://www.mailmasker-dev.com/transactional-email
+    prod: https://www.mailmasker.com/transactional-email
   AWS_ACCOUNT:
     local: ""
     dev: 747558615165
@@ -121,6 +125,7 @@ functions:
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
       API_DOMAIN: ${self:custom.API_DOMAIN.${self:provider.stage}}
       API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
+      ASSETS_BASE_URL: ${self:custom.ASSETS_BASE_URL.${self:provider.stage}}
       S_STAGE: ${self:provider.stage}
       MAIL_DOMAINS: ${self:custom.MAIL_DOMAINS.${self:provider.stage}}
       DAL_ENVIRONMENT: email-forwarder

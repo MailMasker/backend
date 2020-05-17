@@ -14,5 +14,6 @@
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo"
   },
-  "include": ["./src"]
+  "include": ["./src", "./src/email-templates/raw-loader.d.ts"],
+  "exclude": ["node_modules", "./src/**/*.template.html"]
 }

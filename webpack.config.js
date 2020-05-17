@@ -25,8 +25,8 @@ module.exports = {
     rules: [
       {
         // This allows us to `import` files as text
-        // Ex: to import ./src/api/schema/schema.graphql as text
-        test: /\.graphql$/i,
+        // Ex: to import ./someTemplate.template\.html as text
+        test: /\.(graphql|template\.html)$/i,
         use: "raw-loader",
       },
       {

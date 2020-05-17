@@ -69,6 +69,7 @@ export const createVerifiedEmail = async (
         verificationCode: response.verificationCode,
         email: response.email,
       });
+      console.log("verification email sent");
     } catch (err) {
       Bugsnag.notify(err);
       throw new Error(
