@@ -2,9 +2,13 @@ import * as dal from "../../dal/";
 
 import { AuthenticationError, UserInputError } from "apollo-server-core";
 
+import Bugsnag from "@bugsnag/js";
 import { ResolverContext } from "../lib/ResolverContext";
+import populateTemplate from "../../dal/lib/populateTemplate";
 import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
 import { userByID } from "../../dal/userByID";
+
+const mailMaskActiveTemplate = require("../../email-templates/mailMaskActive.template.html");
 
 export const verifyEmailWithCode = async (
   parent,
@@ -30,27 +34,46 @@ export const verifyEmailWithCode = async (
   }
 
   if (verifiedEmail.verified) {
-    // Look up all routes that have this email address and send the intro email
-    const user = await userByID(dalContext, verifiedEmail.ownerUserID);
-    await Promise.all(
-      user.routeIDs.map((routeID) =>
-        dal.routesByIDs(dalContext, [routeID]).then(([route]) => {
-          if (route.redirectToVerifiedEmailID === verifiedEmail.id) {
-            return dal
-              .emailMaskByID(dalContext, route.emailMaskID)
-              .then((emailMask) =>
-                sendTransactionalEmail(ses, {
-                  to: [`${emailMask.alias}@${emailMask.domain}`],
-                  subject: `[Mail Masker] Your new Mail Mask, ${emailMask.alias}@${emailMask.domain}, is now active!`,
-                  bodyHTML: `Emails received at ${emailMask.alias}@${emailMask.domain} (such as this one) will be forwarded to ${verifiedEmail.email}.`,
-                })
-              );
-          } else {
-            return Promise.resolve();
-          }
-        })
-      )
-    );
+    try {
+      // Look up all routes that have this email address and send the intro email
+      const user = await userByID(dalContext, verifiedEmail.ownerUserID);
+      await Promise.all(
+        user.routeIDs.map((routeID) =>
+          dal.routesByIDs(dalContext, [routeID]).then(([route]) => {
+            if (route.redirectToVerifiedEmailID === verifiedEmail.id) {
+              return dal
+                .emailMaskByID(dalContext, route.emailMaskID)
+                .then((emailMask) => {
+                  const mailMaskActiveEmailHTML = populateTemplate(
+                    mailMaskActiveTemplate.default,
+                    [
+                      {
+                        key: "__MAIL_MASK__",
+                        value: `${emailMask.alias}@${emailMask.domain}`,
+                      },
+                      {
+                        key: "__VERIFIED_EMAIL__",
+                        value: verifiedEmail.email,
+                      },
+                    ]
+                  );
+
+                  return sendTransactionalEmail(ses, {
+                    to: [`${emailMask.alias}@${emailMask.domain}`],
+                    subject: `[Mail Masker] ${emailMask.alias}@${emailMask.domain} is now active!`,
+                    bodyHTML: mailMaskActiveEmailHTML,
+                  });
+                });
+            } else {
+              return Promise.resolve();
+            }
+          })
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      Bugsnag.notify(err);
+    }
   }
 
   return {

@@ -6,8 +6,11 @@ import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import Bugsnag from "@bugsnag/js";
 import { EmailMaskInUseInRouteError } from "../../dal/createRoute";
 import { ensureAuthenticated } from "../lib/ensureAuthenticated";
+import populateTemplate from "../../dal/lib/populateTemplate";
 import { redirectToVerifiedEmail } from "../objects/redirectToVerifiedEmail";
 import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
+
+const mailMaskActiveTemplate = require("../../email-templates/mailMaskActive.template.html");
 
 export const createRoute = async (
   parent,
@@ -52,12 +55,27 @@ export const createRoute = async (
     if (verifiedEmail.verified) {
       // Send intro email to new Mail Mask
       try {
+        const mailMaskActiveEmailHTML = populateTemplate(
+          mailMaskActiveTemplate.default,
+          [
+            {
+              key: "__MAIL_MASK__",
+              value: `${emailMask.alias}@${emailMask.domain}`,
+            },
+            {
+              key: "__VERIFIED_EMAIL__",
+              value: verifiedEmail.email,
+            },
+          ]
+        );
+
         await sendTransactionalEmail(context.ses, {
           to: [`${emailMask.alias}@${emailMask.domain}`],
-          subject: `[Mail Masker] Your new Mail Mask, ${emailMask.alias}@${emailMask.domain}, is now active!`,
-          bodyHTML: `Emails received at ${emailMask.alias}@${emailMask.domain} (such as this one) will be forwarded to ${redirectToVerifiedEmail.email}.`,
+          subject: `[Mail Masker] ${emailMask.alias}@${emailMask.domain} is now active!`,
+          bodyHTML: mailMaskActiveEmailHTML,
         });
       } catch (err) {
+        console.error(err);
         Bugsnag.notify(err);
       }
     }
