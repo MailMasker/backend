@@ -3,16 +3,17 @@ import { NotFoundError, verifiedEmailByID } from "../../dal";
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import Bugsnag from "@bugsnag/js";
 import { MutationSendResetPasswordEmailArgs } from "../types.generated";
-import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createPasswordResetRequest } from "../../dal/createPasswordResetRequest";
 import dayjs from "dayjs";
+import populateTemplate from "../../dal/lib/populateTemplate";
 import relativeTime from "dayjs/plugin/relativeTime";
 import sendTransactionalEmail from "../../dal/lib/sendTransactionalEmail";
 import { userByID } from "../../dal/userByID";
 import { userByUsername } from "../../dal/userByUsername";
 import { v4 as uuid } from "uuid";
 import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
-import { visit } from "graphql";
+
+const forgotPasswordTemplate = require("../../email-templates/forgotPassword.template.html");
 
 dayjs.extend(relativeTime);
 
@@ -96,20 +97,26 @@ export const sendResetPasswordEmail = async (
 
   if (process.env.S_STAGE !== "local") {
     try {
+      const forgotPasswordEmailHTML = populateTemplate(
+        forgotPasswordTemplate.default,
+        [
+          {
+            key: "__USERNAME__",
+            value: `${user.username}`,
+          },
+          {
+            key: "__CTA_URL__",
+            value: `${process.env.WEB_APP_BASE_URL}/reset-password/user/${user.id}/code/${verificationCode}/username/${user.username}`,
+          },
+        ]
+      );
+
       await Promise.all(
         destinationEmails.map((email) =>
           sendTransactionalEmail(context.ses, {
             to: [email],
             subject: "[Mail Masker] Reset your password",
-            bodyHTML: `<p>Your username is ${user.username}</p><p><a href="${
-              process.env.WEB_APP_BASE_URL
-            }/reset-password/user/${
-              user.id
-            }/code/${verificationCode}/username/${
-              user.username
-            }">Click here</a> to choose a new password (${email}).</p><p>This link expires ${dayjs().to(
-              dayjs(expiresISO)
-            )}, and has been sent to all of the verified email addresses on your account.</p>`,
+            bodyHTML: forgotPasswordEmailHTML,
           })
         )
       );

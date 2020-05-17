@@ -1,7 +1,6 @@
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import Bugsnag from "@bugsnag/js";
 import { MutationResetPasswordArgs } from "../types.generated";
-import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { createAuthToken } from "../../dal/createAuthToken";
 import dayjs from "dayjs";
 import { deleteAllAuthTokensForUserID } from "../../dal/deleteAllAuthTokensForUserID";
