@@ -149,13 +149,9 @@ const apollo = new ApolloServer({
         res.cookie("jwt", authToken, {
           httpOnly: true,
           ...(secondsUntilExpiry ? { maxAge: secondsUntilExpiry } : {}),
-          // TODO: turn this on for prod eventually
-          //secure: true, //on HTTPS
+          secure: true,
           domain: process.env.API_DOMAIN,
-
-          // Allows cookies to be sent in cross-site requests (our API in on a different domain than our web app, at least for the time being)
-          // TODO: update this when we get our own domain used on the API instead of the generic Lambda domain
-          sameSite: "none",
+          sameSite: process.env.S_STAGE === "local" ? "none" : "strict",
         });
       },
       clearAuthCookie: () => {
