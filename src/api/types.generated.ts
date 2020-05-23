@@ -50,6 +50,7 @@ export type Mutation = {
   sendResetPasswordEmail?: Maybe<Scalars['Boolean']>,
   resetPassword?: Maybe<Scalars['Boolean']>,
   verifyEmailWithCode: VerifiedEmail,
+  createCheckoutSession: Scalars['String'],
 };
 
 
@@ -123,6 +124,11 @@ export type MutationResetPasswordArgs = {
 export type MutationVerifyEmailWithCodeArgs = {
   email: Scalars['String'],
   code: Scalars['String']
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  priceID: Scalars['String']
 };
 
 export type Query = {
@@ -293,6 +299,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   sendResetPasswordEmail?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationSendResetPasswordEmailArgs, 'usernameOrEmail'>>,
   resetPassword?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationResetPasswordArgs, 'newPassword' | 'code' | 'userID'>>,
   verifyEmailWithCode?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationVerifyEmailWithCodeArgs, 'email' | 'code'>>,
+  createCheckoutSession?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateCheckoutSessionArgs, 'priceID'>>,
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{

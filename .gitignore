@@ -19,4 +19,6 @@ local/dynamodb/shared-local-instance.db
 deploy-dev.sh
 deploy-prod.sh
 
-jwt_secret.txt
+secrets-local.yml
+secrets-dev.yml
+secrets-prod.yml

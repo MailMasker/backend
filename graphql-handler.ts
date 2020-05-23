@@ -1,3 +1,5 @@
+// @ts-ignore
+import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
   ResolverContext,
@@ -5,8 +7,6 @@ import {
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import AWS from "aws-sdk";
-// @ts-ignore
-import { ApolloServer } from "apollo-server-express";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import { DALContext } from "./src/dal/DALContext";
@@ -14,6 +14,7 @@ import { authenticate } from "./src/api/mutations/authenticate";
 import { authenticated } from "./src/api/lib/authenticated";
 import { combineResolvers } from "graphql-resolvers";
 import cookieParser from "cookie-parser";
+import { createCheckoutSession } from "./src/api/mutations/createCheckoutSession";
 import { createEmailMask } from "./src/api/mutations/createEmailMask";
 import { createRoute } from "./src/api/mutations/createRoute";
 import { createUser } from "./src/api/mutations/createUser";
@@ -99,6 +100,8 @@ const mutationResolvers: MutationResolvers = {
   resetPassword,
 
   verifyEmailWithCode,
+
+  createCheckoutSession: combineResolvers(authenticated, createCheckoutSession),
 };
 
 const apollo = new ApolloServer({
@@ -122,15 +125,21 @@ const apollo = new ApolloServer({
 
     let currentUserID: string | undefined;
     if (authToken) {
-      // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
-      const { userID, username } = jwt.verify(
-        authToken,
-        process.env.JWT_SECRET as string
-      ) as {
-        userID: string;
-        username: string;
-      };
-      currentUserID = userID;
+      try {
+        // This is based on: https://github.com/flaviocopes/apollo-graphql-client-server-authentication-jwt/blob/master/server/index.js
+        const { userID, username } = jwt.verify(
+          authToken,
+          process.env.JWT_SECRET as string
+        ) as {
+          userID: string;
+          username: string;
+        };
+        currentUserID = userID;
+      } catch (err) {
+        console.log(err);
+        res.clearCookie("jwt");
+        throw new AuthenticationError("It looks like you need to log in again");
+      }
     }
 
     const context: ResolverContext | AuthenticatedResolverContext = {

@@ -46,7 +46,8 @@ custom:
     packagerOptions:
       scripts:
         - rm -rf node_modules/aws-sdk
-  JWT_SECRET: ${file(jwt_secret.txt)}
+  JWT_SECRET: ${file(./secrets-${self:provider.stage}.yml):jwt_secret}
+  STRIPE_PRIVATE_KEY: ${file(./secrets-${self:provider.stage}.yml):stripe_private_key}
   WEB_APP_BASE_URL:
     local: https://localhost:4200
     dev: https://app.mailmasker-dev.com
@@ -122,6 +123,7 @@ functions:
             allowCredentials: true
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
+      STRIPE_PRIVATE_KEY: ${self:custom.STRIPE_PRIVATE_KEY}
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
       API_DOMAIN: ${self:custom.API_DOMAIN.${self:provider.stage}}
       API_BASE_URL: ${self:custom.API_BASE_URL.${self:provider.stage}}
@@ -137,5 +139,17 @@ functions:
       - http:
           path: playground
           method: get
+
+  stripe:
+    handler: src/stripe-callbacks-handler.handler
+    events:
+      - http:
+          path: stripe-callbacks
+          method: post
     environment:
+      JWT_SECRET: ${self:custom.JWT_SECRET}
+      STRIPE_PRIVATE_KEY: ${self:custom.STRIPE_PRIVATE_KEY}
+      WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
       S_STAGE: ${self:provider.stage}
+      DAL_ENVIRONMENT: email-forwarder
+      BUGSNAG_RELEASE_STAGE: ${self:provider.stage}

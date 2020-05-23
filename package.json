@@ -17,6 +17,7 @@
     "apollo-server-core": "^2.12.0",
     "apollo-server-express": "^2.10.0",
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "dayjs": "^1.8.25",
     "express": "^4.17.1",
@@ -26,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "raw-loader": "^4.0.1",
     "serverless-http": "^2.3.0",
+    "stripe": "^8.55.0",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
