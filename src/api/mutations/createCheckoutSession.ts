@@ -31,8 +31,8 @@ export const createCheckoutSession = async (
         },
       ],
       mode: "subscription",
-      success_url: `https://${process.env.WEB_APP_BASE_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://${process.env.WEB_APP_BASE_URL}/checkout-cancel?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.WEB_APP_BASE_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.WEB_APP_BASE_URL}/checkout-cancel?session_id={CHECKOUT_SESSION_ID}`,
     });
 
     console.debug("session", session);
