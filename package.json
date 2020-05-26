@@ -7,7 +7,8 @@
     "offline-show-response": "sls offline --printOutput",
     "deploy-dev": "./deploy-dev.sh",
     "gencerts": "mkcert localhost 127.0.0.1",
-    "logs-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-graphql --start='1 minute'"
+    "logs-graphql-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-graphql --start='1 minute'",
+    "logs-stripe-callbacks-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-stripe --start='1 minute'"
   },
   "dependencies": {
     "@bugsnag/js": "^7.0.1",

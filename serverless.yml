@@ -48,6 +48,7 @@ custom:
         - rm -rf node_modules/aws-sdk
   JWT_SECRET: ${file(./secrets-${self:provider.stage}.yml):jwt_secret}
   STRIPE_PRIVATE_KEY: ${file(./secrets-${self:provider.stage}.yml):stripe_private_key}
+  STRIPE_ENDPOINT_SECRET: ${file(./secrets-${self:provider.stage}.yml):stripe_endpoint_secret}
   WEB_APP_BASE_URL:
     local: https://localhost:4200
     dev: https://app.mailmasker-dev.com
@@ -149,6 +150,7 @@ functions:
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
       STRIPE_PRIVATE_KEY: ${self:custom.STRIPE_PRIVATE_KEY}
+      STRIPE_ENDPOINT_SECRET: ${self:custom.STRIPE_ENDPOINT_SECRET}
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
       S_STAGE: ${self:provider.stage}
       DAL_ENVIRONMENT: email-forwarder
