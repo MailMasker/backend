@@ -1,9 +1,18 @@
+import AWS from "aws-sdk";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import { ConfigurationServicePlaceholders } from "aws-sdk/lib/config_service_placeholders";
+import { DALContext } from "./dal";
 import bodyParser from "body-parser";
 import express from "express";
 import serverless from "serverless-http";
+import { updateUser } from "./dal/updateUser";
+
+AWS.config.update({ region: "us-east-1" });
+
+const dalContext: DALContext = {
+  ddb: new AWS.DynamoDB({}),
+};
 
 Bugsnag.start({
   apiKey: "3e593a7f71377ef86cf65c7cda2570db",
@@ -53,11 +62,18 @@ app.post(
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
+      console.log(
+        `checkout of session ${session.id} resulted in subscription ${session.subscription}`
+      );
+
+      // updateUser(dalContext, )
+
       // Fulfill the purchase...
-      console.log(session);
+      console.debug(session);
     } else if (event.type === "customer.subscription.deleted") {
-      const session = event.data.object;
-      console.log("deleted subscription: ", session);
+      const subscription = event.data.object;
+
+      console.log(`deleted subscription ${subscription.id}`);
     }
 
     // Return a response to acknowledge receipt of the event
