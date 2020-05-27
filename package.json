@@ -8,7 +8,7 @@
     "deploy-dev": "./deploy-dev.sh",
     "gencerts": "mkcert localhost 127.0.0.1",
     "logs-graphql-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-graphql --start='1 minute'",
-    "logs-stripe-callbacks-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-stripe --start='1 minute'"
+    "logs-stripe-callbacks-dev": "aws-vault exec email-forwarder-dev -- cw tail -f /aws/lambda/email-forwarder-api-dev-stripe --region=us-east-1"
   },
   "dependencies": {
     "@bugsnag/js": "^7.0.1",

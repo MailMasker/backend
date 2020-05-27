@@ -42,6 +42,11 @@ Bugsnag.start({
   apiKey: "3e593a7f71377ef86cf65c7cda2570db",
   plugins: [BugsnagPluginExpress],
   releaseStage: process.env.BUGSNAG_RELEASE_STAGE,
+  enabledReleaseStages: ["dev", "prod"],
+  appType: "graphql",
+  // @ts-ignore
+  collectUserIp: false,
+  hostname: process.env.API_DOMAIN,
 });
 
 if (!process.env.WEB_APP_BASE_URL) {
@@ -135,6 +140,7 @@ const apollo = new ApolloServer({
           username: string;
         };
         currentUserID = userID;
+        Bugsnag.setUser(userID);
       } catch (err) {
         console.log(err);
         res.clearCookie("jwt");

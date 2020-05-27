@@ -1,8 +1,13 @@
+import {
+  AuthenticatedResolverContext,
+  ResolverContext,
+} from "../lib/ResolverContext";
+
 import { ApolloError } from "apollo-server-core";
 import Bugsnag from "@bugsnag/js";
 import { MutationCreateCheckoutSessionArgs } from "../types.generated";
-import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-express";
+import { createStripeCheckoutSession } from "../../dal/createStripeCheckoutSession";
 
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 if (!process.env.STRIPE_PRIVATE_KEY) {
@@ -12,9 +17,12 @@ if (!process.env.STRIPE_PRIVATE_KEY) {
 export const createCheckoutSession = async (
   parent,
   args: MutationCreateCheckoutSessionArgs,
-  { dalContext }: ResolverContext,
+  { dalContext, currentUserID }: AuthenticatedResolverContext,
   info
 ) => {
+  if (!currentUserID) {
+    throw new Error("couldn't determine user");
+  }
   if (!args.priceID) {
     throw new UserInputError("Unable to check out because plan not selected");
   }
@@ -36,6 +44,8 @@ export const createCheckoutSession = async (
     });
 
     console.debug("session", session);
+
+    await createStripeCheckoutSession(dalContext, currentUserID, session.id);
 
     return session.id;
   } catch (error) {

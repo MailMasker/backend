@@ -152,6 +152,7 @@ functions:
       STRIPE_PRIVATE_KEY: ${self:custom.STRIPE_PRIVATE_KEY}
       STRIPE_ENDPOINT_SECRET: ${self:custom.STRIPE_ENDPOINT_SECRET}
       WEB_APP_BASE_URL: ${self:custom.WEB_APP_BASE_URL.${self:provider.stage}}
+      API_DOMAIN: ${self:custom.API_DOMAIN.${self:provider.stage}}
       S_STAGE: ${self:provider.stage}
       DAL_ENVIRONMENT: email-forwarder
       BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
