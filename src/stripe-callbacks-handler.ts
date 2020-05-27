@@ -7,9 +7,12 @@ import Stripe from "stripe";
 import bodyParser from "body-parser";
 import { createStripeCheckoutSession } from "./dal/createStripeCheckoutSession";
 import { createStripeSubscription } from "./dal/createStripeSubscription";
+import dayjs from "dayjs";
 import express from "express";
+import { markStripeSubscriptionDeleted } from "./dal/markStripeSubscriptionDeleted";
 import serverless from "serverless-http";
 import { stripeCheckoutSessionByID } from "./dal/stripeCheckoutSessionByID";
+import { stripeSubscriptionByID } from "./dal/stripeSubscriptionByID";
 import { updateUser } from "./dal/updateUser";
 import { userByID } from "./dal/userByID";
 
@@ -109,7 +112,16 @@ app.post(
     } else if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as Stripe.Subscription;
 
-      // TODO: delete the subscription's
+      const { userID } = await stripeSubscriptionByID(
+        dalContext,
+        subscription.id
+      );
+
+      await markStripeSubscriptionDeleted(dalContext, {
+        stripeSubscriptionID: subscription.id,
+        userID,
+        deletedISO: dayjs().toISOString(),
+      });
 
       console.log(`deleted subscription ${subscription.id}`);
     }
@@ -120,5 +132,5 @@ app.post(
 );
 
 const handler = serverless(app);
-
+"";
 export { handler };
