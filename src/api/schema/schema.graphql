@@ -35,6 +35,15 @@ type User {
   routes: [Route!]!
   emailMasks: [EmailMask!]!
   verifiedEmails: [VerifiedEmail!]!
+  plan: Plan
+}
+
+interface Plan {
+  displayName: String!
+}
+
+type SubscriptionPlan implements Plan {
+  displayName: String!
 }
 
 type Me {

@@ -1,11 +1,13 @@
 import * as dal from "../../dal/";
 
+import { Plan, ResolversTypes } from "../types.generated";
+
 import { AuthenticationError } from "apollo-server-express";
-import { ResolversTypes } from "../types.generated";
+import { transformUser } from "../../dal/transforms/transformUser";
 import { userByID } from "../../dal/userByID";
 
 export const user: ResolversTypes["user"] = async (
-  parent,
+  parent: ReturnType<typeof transformUser>,
   args,
   { dalContext, currentUserID },
   info
@@ -32,11 +34,20 @@ export const user: ResolversTypes["user"] = async (
     ),
   ]);
 
+  let plan: Plan | undefined;
+  if (parent._planName === "premium") {
+    // Hard-code the only plan we have for now
+    plan = {
+      displayName: "Premium",
+    };
+  }
+
   return {
     id,
     username,
     verifiedEmails,
     emailMasks,
+    plan,
     routes: () =>
       dal.routesByIDs(dalContext, routeIDs).then((routes) =>
         routes.map((route) => ({

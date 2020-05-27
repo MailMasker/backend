@@ -1,11 +1,9 @@
 import AWS from "aws-sdk";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
-import { ConfigurationServicePlaceholders } from "aws-sdk/lib/config_service_placeholders";
 import { DALContext } from "./dal";
 import Stripe from "stripe";
 import bodyParser from "body-parser";
-import { createStripeCheckoutSession } from "./dal/createStripeCheckoutSession";
 import { createStripeSubscription } from "./dal/createStripeSubscription";
 import dayjs from "dayjs";
 import express from "express";
@@ -13,7 +11,6 @@ import { markStripeSubscriptionDeleted } from "./dal/markStripeSubscriptionDelet
 import serverless from "serverless-http";
 import { stripeCheckoutSessionByID } from "./dal/stripeCheckoutSessionByID";
 import { stripeSubscriptionByID } from "./dal/stripeSubscriptionByID";
-import { updateUser } from "./dal/updateUser";
 import { userByID } from "./dal/userByID";
 
 AWS.config.update({ region: "us-east-1" });
@@ -96,8 +93,8 @@ app.post(
 
       console.log("finished looking up user by ID");
 
-      if (user.stripeSubscriptionID) {
-        const errorMessage = `user ${userID} is checking out and added new subscription ${session.subscription}, but already has existing subscription ${user.stripeSubscriptionID}. we will allow the old one to be overwritten, but in this case, there may be multiple subscriptions for this user.`;
+      if (user._stripeSubscriptionID) {
+        const errorMessage = `user ${userID} is checking out and added new subscription ${session.subscription}, but already has existing subscription ${user._stripeSubscriptionID}. we will allow the old one to be overwritten, but in this case, there may be multiple subscriptions for this user.`;
         console.error(errorMessage);
         Bugsnag.notify(new Error(errorMessage));
       }

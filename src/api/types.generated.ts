@@ -131,6 +131,10 @@ export type MutationCreateCheckoutSessionArgs = {
   priceID: Scalars['String']
 };
 
+export type Plan = {
+  displayName: Scalars['String'],
+};
+
 export type Query = {
    __typename?: 'Query',
   me: Me,
@@ -146,6 +150,11 @@ export type Route = {
   expiresISO?: Maybe<Scalars['String']>,
 };
 
+export type SubscriptionPlan = Plan & {
+   __typename?: 'SubscriptionPlan',
+  displayName: Scalars['String'],
+};
+
 export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
@@ -153,6 +162,7 @@ export type User = {
   routes: Array<Route>,
   emailMasks: Array<EmailMask>,
   verifiedEmails: Array<VerifiedEmail>,
+  plan?: Maybe<Plan>,
 };
 
 export type VerifiedEmail = {
@@ -243,9 +253,11 @@ export type ResolversTypes = ResolversObject<{
   VerifiedEmail: ResolverTypeWrapper<VerifiedEmail>,
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>,
   EmailMask: ResolverTypeWrapper<EmailMask>,
+  Plan: ResolverTypeWrapper<Plan>,
   Mutation: ResolverTypeWrapper<{}>,
   CreateUserPayload: ResolverTypeWrapper<CreateUserPayload>,
   DeleteUserPayload: ResolverTypeWrapper<DeleteUserPayload>,
+  SubscriptionPlan: ResolverTypeWrapper<SubscriptionPlan>,
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -259,9 +271,11 @@ export type ResolversParentTypes = ResolversObject<{
   VerifiedEmail: VerifiedEmail,
   Boolean: Scalars['Boolean'],
   EmailMask: EmailMask,
+  Plan: Plan,
   Mutation: {},
   CreateUserPayload: CreateUserPayload,
   DeleteUserPayload: DeleteUserPayload,
+  SubscriptionPlan: SubscriptionPlan,
 }>;
 
 export type CreateUserPayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateUserPayload'] = ResolversParentTypes['CreateUserPayload']> = ResolversObject<{
@@ -302,6 +316,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createCheckoutSession?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationCreateCheckoutSessionArgs, 'priceID'>>,
 }>;
 
+export type PlanResolvers<ContextType = any, ParentType extends ResolversParentTypes['Plan'] = ResolversParentTypes['Plan']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'SubscriptionPlan', ParentType, ContextType>,
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
@@ -315,12 +334,17 @@ export type RouteResolvers<ContextType = any, ParentType extends ResolversParent
   expiresISO?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
 }>;
 
+export type SubscriptionPlanResolvers<ContextType = any, ParentType extends ResolversParentTypes['SubscriptionPlan'] = ResolversParentTypes['SubscriptionPlan']> = ResolversObject<{
+  displayName?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+}>;
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>,
   username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>,
   routes?: Resolver<Array<ResolversTypes['Route']>, ParentType, ContextType>,
   emailMasks?: Resolver<Array<ResolversTypes['EmailMask']>, ParentType, ContextType>,
   verifiedEmails?: Resolver<Array<ResolversTypes['VerifiedEmail']>, ParentType, ContextType>,
+  plan?: Resolver<Maybe<ResolversTypes['Plan']>, ParentType, ContextType>,
 }>;
 
 export type VerifiedEmailResolvers<ContextType = any, ParentType extends ResolversParentTypes['VerifiedEmail'] = ResolversParentTypes['VerifiedEmail']> = ResolversObject<{
@@ -335,8 +359,10 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   EmailMask?: EmailMaskResolvers<ContextType>,
   Me?: MeResolvers<ContextType>,
   Mutation?: MutationResolvers<ContextType>,
+  Plan?: PlanResolvers,
   Query?: QueryResolvers<ContextType>,
   Route?: RouteResolvers<ContextType>,
+  SubscriptionPlan?: SubscriptionPlanResolvers<ContextType>,
   User?: UserResolvers<ContextType>,
   VerifiedEmail?: VerifiedEmailResolvers<ContextType>,
 }>;

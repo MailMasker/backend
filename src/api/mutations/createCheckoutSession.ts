@@ -41,6 +41,8 @@ export const createCheckoutSession = async (
       mode: "subscription",
       success_url: `${process.env.WEB_APP_BASE_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.WEB_APP_BASE_URL}/checkout-cancel?session_id={CHECKOUT_SESSION_ID}`,
+      // TODO: prefill with a Mail Mask
+      // customer_email: `${}`
     });
 
     console.debug("session", session);
