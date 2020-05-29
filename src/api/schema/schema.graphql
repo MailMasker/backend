@@ -38,11 +38,13 @@ type User {
   plan: Plan
 }
 
-interface Plan {
-  displayName: String!
+enum PlanType {
+  FREE
+  PREMIUM
 }
 
-type SubscriptionPlan implements Plan {
+type Plan {
+  type: PlanType!
   displayName: String!
 }
 

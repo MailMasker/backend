@@ -26,6 +26,8 @@ import { exportData } from "./src/api/queries/exportData";
 import express from "express";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
+import newDynamoDB from "./src/dal/lib/newDynamoDB";
+import { plan } from "./src/api/objects/plan";
 import { redirectToVerifiedEmail } from "./src/api/objects/redirectToVerifiedEmail";
 import { resendVerificationEmail } from "./src/api/mutations/resendVerificationEmail";
 import { resetPassword } from "./src/api/mutations/resetPassword";
@@ -56,23 +58,8 @@ if (!process.env.API_DOMAIN) {
   throw new Error("missing process.env.API_DOMAIN");
 }
 
-AWS.config.update({ region: "us-east-1" });
-
-let ddbOptions = {};
-
-// connect to local DB if running offline
-if (process.env.S_STAGE === "local") {
-  console.log("using local dynamodb");
-  ddbOptions = {
-    region: "localhost",
-    endpoint: "http://localhost:8000",
-    accessKeyId: "DEFAULT_ACCESS_KEY", // needed if you don't have aws credentials at all in env
-    secretAccessKey: "DEFAULT_SECRET", // needed if you don't have aws credentials at all in env
-  };
-}
-
 const dalContext: DALContext = {
-  ddb: new AWS.DynamoDB(ddbOptions),
+  ddb: newDynamoDB(),
 };
 
 const queryResolvers: QueryResolvers = {
@@ -117,6 +104,7 @@ const apollo = new ApolloServer({
     Route: { redirectToVerifiedEmail, emailMask },
     EmailMask: { children: emailMaskChildren },
     Mutation: { ...mutationResolvers },
+    User: { plan },
   },
   introspection: true,
   context: async ({ req, res }) => {

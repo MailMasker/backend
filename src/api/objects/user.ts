@@ -24,6 +24,7 @@ export const user: ResolversTypes["user"] = async (
     verifiedEmailIDs,
     emailMaskIDs,
     routeIDs,
+    _planDetails,
   } = await userByID(dalContext, currentUserID);
 
   // Look up email masks in advance to save DDB lookups
@@ -34,20 +35,12 @@ export const user: ResolversTypes["user"] = async (
     ),
   ]);
 
-  let plan: Plan | undefined;
-  if (parent._planName === "premium") {
-    // Hard-code the only plan we have for now
-    plan = {
-      displayName: "Premium",
-    };
-  }
-
   return {
     id,
     username,
     verifiedEmails,
     emailMasks,
-    plan,
+    _planDetails,
     routes: () =>
       dal.routesByIDs(dalContext, routeIDs).then((routes) =>
         routes.map((route) => ({

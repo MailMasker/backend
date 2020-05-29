@@ -8,15 +8,14 @@ import { createStripeSubscription } from "./dal/createStripeSubscription";
 import dayjs from "dayjs";
 import express from "express";
 import { markStripeSubscriptionDeleted } from "./dal/markStripeSubscriptionDeleted";
+import newDynamoDB from "./dal/lib/newDynamoDB";
 import serverless from "serverless-http";
 import { stripeCheckoutSessionByID } from "./dal/stripeCheckoutSessionByID";
 import { stripeSubscriptionByID } from "./dal/stripeSubscriptionByID";
 import { userByID } from "./dal/userByID";
 
-AWS.config.update({ region: "us-east-1" });
-
 const dalContext: DALContext = {
-  ddb: new AWS.DynamoDB({}),
+  ddb: newDynamoDB(),
 };
 
 Bugsnag.start({
@@ -53,15 +52,6 @@ app.post(
       throw new Error("endpointSecret missing");
     }
 
-    // console.debug("request.headers: ");
-    // console.debug(request.headers);
-
-    // console.debug("request: ");
-    // console.debug(request);
-
-    console.debug("endpointSecret: ");
-    console.debug(endpointSecret);
-
     let event: ReturnType<typeof stripe.webhooks.constructEvent>;
 
     try {
@@ -74,6 +64,8 @@ app.post(
       Bugsnag.notify(err);
       return response.status(400).send(`Webhook Error: ${err.message}`);
     }
+
+    console.log(`stripe event type: ${event.type}`);
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -122,6 +114,8 @@ app.post(
 
       console.log(`deleted subscription ${subscription.id}`);
     }
+
+    console.log("stripe webhook callback done");
 
     // Return a response to acknowledge receipt of the event
     response.json({ received: true });

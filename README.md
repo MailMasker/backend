@@ -1,5 +1,7 @@
 # Getting Started
 
+The following are quick notes, jotted-down in the moment as a basis for future documentation.
+
 ## Check out the repo
 
 Clone the repo. Note that this project uses submodules:
@@ -50,6 +52,24 @@ Running GraphQL Playground to test the API:
 2. Set the URL text box inside the interface itself to `https://localhost:4201/local/graphql` – this is because the local API is at https://localhost:4201/local/graphql
 3. Open Settings in the GraphQL Playground interface and set `request.credentials` to `include`
 4. Set `schema.polling.enable` to `false` in order to make much less noise in your CloudWatch logs
+
+### Testing Stripe callbacks
+
+brew cask install ngrok
+
+OR
+
+brew cask upgrade ngrok
+
+Start the ngrok tunneling, which gives you
+
+```
+ngrok http https://localhost:4201
+```
+
+In the Stripe dashboard, turn on "test data", and configure a webhook to post to the URL that ngrok gives you (ex: https://a6f04893b67d.ngrok.io)
+
+Note: the ngrok free plan gives you a different URL every time you start it, so you'll have to continually update the Stripe webhook URL
 
 ## Running in dev
 
