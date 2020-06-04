@@ -70,7 +70,9 @@ export type MutationCreateUserArgs = {
   username: Scalars['String'],
   password: Scalars['String'],
   uuid: Scalars['String'],
-  persistent: Scalars['Boolean']
+  persistent: Scalars['Boolean'],
+  emailMask: Scalars['String'],
+  verifiedEmail: Scalars['String']
 };
 
 
@@ -147,6 +149,12 @@ export type Query = {
   me: Me,
   ping: Scalars['String'],
   exportData: Scalars['String'],
+  isEmailMaskAvailable?: Maybe<Scalars['Boolean']>,
+};
+
+
+export type QueryIsEmailMaskAvailableArgs = {
+  email: Scalars['String']
 };
 
 export type Route = {
@@ -305,7 +313,7 @@ export type MeResolvers<ContextType = any, ParentType extends ResolversParentTyp
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   authenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<MutationAuthenticateArgs, 'username' | 'password' | 'persistent'>>,
   unauthenticate?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, MutationUnauthenticateArgs>,
-  createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid' | 'persistent'>>,
+  createUser?: Resolver<ResolversTypes['CreateUserPayload'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'username' | 'password' | 'uuid' | 'persistent' | 'emailMask' | 'verifiedEmail'>>,
   deleteUser?: Resolver<ResolversTypes['DeleteUserPayload'], ParentType, ContextType, RequireFields<MutationDeleteUserArgs, 'password'>>,
   createVerifiedEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationCreateVerifiedEmailArgs, 'email'>>,
   resendVerificationEmail?: Resolver<ResolversTypes['VerifiedEmail'], ParentType, ContextType, RequireFields<MutationResendVerificationEmailArgs, 'email'>>,
@@ -327,6 +335,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   me?: Resolver<ResolversTypes['Me'], ParentType, ContextType>,
   ping?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
   exportData?: Resolver<ResolversTypes['String'], ParentType, ContextType>,
+  isEmailMaskAvailable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType, RequireFields<QueryIsEmailMaskAvailableArgs, 'email'>>,
 }>;
 
 export type RouteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Route'] = ResolversParentTypes['Route']> = ResolversObject<{

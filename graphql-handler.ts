@@ -24,6 +24,7 @@ import { emailMask } from "./src/api/objects/emailMask";
 import { emailMaskChildren } from "./src/api/objects/emailMaskChildren";
 import { exportData } from "./src/api/queries/exportData";
 import express from "express";
+import { isEmailMaskAvailable } from "./src/api/queries/isEmailMaskAvailable";
 import jwt from "jsonwebtoken";
 import { me } from "./src/api/queries/me";
 import newDynamoDB from "./src/dal/lib/newDynamoDB";
@@ -68,6 +69,7 @@ const queryResolvers: QueryResolvers = {
   },
   me: combineResolvers(authenticated, me),
   exportData: combineResolvers(authenticated, exportData),
+  isEmailMaskAvailable,
 };
 
 const mutationResolvers: MutationResolvers = {

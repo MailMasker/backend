@@ -64,6 +64,8 @@ type Query {
   me: Me!
   ping: String!
   exportData: String!
+
+  isEmailMaskAvailable(email: String!): Boolean
 }
 
 type Mutation {
@@ -80,6 +82,8 @@ type Mutation {
     password: String!
     uuid: String!
     persistent: Boolean!
+    emailMask: String!
+    verifiedEmail: String!
   ): CreateUserPayload!
   deleteUser(password: String!): DeleteUserPayload!
 
