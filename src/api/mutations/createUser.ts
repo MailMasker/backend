@@ -1,14 +1,16 @@
 import * as dal from "../../dal/";
 
+import Bugsnag from "@bugsnag/js";
 import { MutationResolvers } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-core";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
+import sendVerificationEmail from "../lib/sendVerificationEmail";
 
 export const createUser: MutationResolvers["createUser"] = async (
   parent,
   args,
-  { setAuthCookie, dalContext }: ResolverContext,
+  { setAuthCookie, dalContext, ses }: ResolverContext,
   info
 ) => {
   const desiredUsername = args.username.trim();
@@ -30,10 +32,11 @@ export const createUser: MutationResolvers["createUser"] = async (
     throw new UserInputError("the Mail Mask you've chosen is already taken");
   }
 
-  // TODO: some sday handle duplicate requests via UUID, but need to check for password match (maybe just call authenticate() ?)
+  // TODO: some say handle duplicate requests via UUID, but need to check for password match (maybe just call authenticate() ?)
 
   const {
     user: { id: userID, username },
+    verifiedEmail,
     auth: { authToken, secondsUntilExpiry },
   } = await dal.createUser(dalContext, {
     username: desiredUsername,
@@ -43,6 +46,21 @@ export const createUser: MutationResolvers["createUser"] = async (
     emailMask: args.emailMask,
     verifiedEmail: args.verifiedEmail,
   });
+
+  if (process.env.S_STAGE !== "local") {
+    try {
+      await sendVerificationEmail(ses, {
+        verificationCode: verifiedEmail.verificationCode,
+        email: verifiedEmail.email,
+      });
+      console.log("verification email sent");
+    } catch (err) {
+      Bugsnag.notify(err);
+      throw new Error(
+        "We had some trouble sending you the verification email. Please try again."
+      );
+    }
+  }
 
   setAuthCookie({ authToken, secondsUntilExpiry });
 

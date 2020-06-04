@@ -13,8 +13,6 @@ export default async function sendVerificationEmail(
     verificationCode: string;
   }
 ) {
-  console.log("verifyEmailTemplate: ", verifyEmailTemplate.default);
-
   const verifyEmailHTML = populateTemplate(verifyEmailTemplate.default, [
     { key: "__EMAIL_ADDRESS__", value: email },
     {
@@ -22,8 +20,6 @@ export default async function sendVerificationEmail(
       value: `${process.env.WEB_APP_BASE_URL}/verify-email/${email}/code/${verificationCode}`,
     },
   ]);
-
-  console.log("verifyEmailHTML: ", verifyEmailHTML);
 
   await sendTransactionalEmail(ses, {
     to: [email],
