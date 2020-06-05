@@ -1,11 +1,13 @@
 import * as dal from "../../dal/";
 
 import Bugsnag from "@bugsnag/js";
+import { MaxNumAccountsSharingAVerifiedEmail } from "../../dal/lib/constants";
 import { MutationResolvers } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import { UserInputError } from "apollo-server-core";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
+import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
 
 export const createUser: MutationResolvers["createUser"] = async (
   parent,
@@ -32,6 +34,31 @@ export const createUser: MutationResolvers["createUser"] = async (
     throw new UserInputError("the Mail Mask you've chosen is already taken");
   }
 
+  // We do this primarily to prevent having to paginate or deal with performance issues when using the verifiedEmailsByEmailForAllUsers lookup once someone inevitably create many accounts
+  // NOTE: this doesn't prevent people from doing you+1@gmail.com, but that's OK
+  let verifiedEmailUsedTooManyTimes = false;
+  try {
+    const existingVerifiedEmails = await verifiedEmailsByEmailForAllUsers(
+      dalContext,
+      { email: args.verifiedEmail.trim() }
+    );
+    if (existingVerifiedEmails.length >= MaxNumAccountsSharingAVerifiedEmail) {
+      verifiedEmailUsedTooManyTimes = true;
+    }
+  } catch (err) {
+    if (err instanceof dal.NotFoundError) {
+      // No problem
+    }
+    // Let's just move on... hopefully the error is intermittent
+    console.error(err);
+    Bugsnag.notify(err);
+  }
+  if (verifiedEmailUsedTooManyTimes) {
+    throw new UserInputError(
+      `the email address ${args.verifiedEmail.trim()} has already been verified on the maximum number of accounts`
+    );
+  }
+
   // TODO: some say handle duplicate requests via UUID, but need to check for password match (maybe just call authenticate() ?)
 
   const {
@@ -39,12 +66,12 @@ export const createUser: MutationResolvers["createUser"] = async (
     verifiedEmail,
     auth: { authToken, secondsUntilExpiry },
   } = await dal.createUser(dalContext, {
-    username: desiredUsername,
-    password: desiredPassword,
+    username: desiredUsername.trim(),
+    password: desiredPassword.trim(),
     requestUUID: args.uuid,
     persistent: args.persistent,
-    emailMask: args.emailMask,
-    verifiedEmail: args.verifiedEmail,
+    emailMask: args.emailMask.trim(),
+    verifiedEmail: args.verifiedEmail.trim(),
   });
 
   if (process.env.S_STAGE !== "local") {

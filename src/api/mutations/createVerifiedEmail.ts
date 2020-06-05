@@ -2,12 +2,15 @@ import * as dal from "../../dal/createVerifiedEmail";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import Bugsnag from "@bugsnag/js";
+import { MaxNumAccountsSharingAVerifiedEmail } from "../../dal/lib/constants";
+import { MutationCreateVerifiedEmailArgs } from "../types.generated";
 import { NotFoundError } from "../../dal";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
 import { deconstructExternalEmail } from "../../dal/lib/deconstructExternalEmail";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
+import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
 
 if (!process.env.WEB_APP_BASE_URL) {
   throw new Error("missing process.env.WEB_APP_BASE_URL");
@@ -15,7 +18,7 @@ if (!process.env.WEB_APP_BASE_URL) {
 
 export const createVerifiedEmail = async (
   parent,
-  args,
+  args: MutationCreateVerifiedEmailArgs,
   { dalContext, currentUserID, ses }: AuthenticatedResolverContext,
   info
 ) => {
@@ -33,10 +36,35 @@ export const createVerifiedEmail = async (
     );
   }
 
+  // We do this primarily to prevent having to paginate or deal with performance issues when using the verifiedEmailsByEmailForAllUsers lookup once someone inevitably create many accounts
+  // NOTE: this doesn't prevent people from doing you+1@gmail.com, but that's OK
+  let verifiedEmailUsedTooManyTimes = false;
+  try {
+    const existingVerifiedEmails = await verifiedEmailsByEmailForAllUsers(
+      dalContext,
+      { email: args.email.trim() }
+    );
+    if (existingVerifiedEmails.length >= MaxNumAccountsSharingAVerifiedEmail) {
+      verifiedEmailUsedTooManyTimes = true;
+    }
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      // No problem
+    }
+    // Let's just move on... hopefully the error is intermittent
+    console.error(err);
+    Bugsnag.notify(err);
+  }
+  if (verifiedEmailUsedTooManyTimes) {
+    throw new UserInputError(
+      `the email address ${args.email.trim()} has already been verified on the maximum number of accounts`
+    );
+  }
+
   let existingVerifiedEmail;
   try {
     existingVerifiedEmail = await verifiedEmailByEmail(dalContext, {
-      email: args.email,
+      email: args.email.trim(),
       ownerUserID: currentUserID,
     });
   } catch (err) {
