@@ -8,7 +8,7 @@ import { NotFoundError } from "../../dal";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
 import { deconstructExternalEmail } from "../../dal/lib/deconstructExternalEmail";
-import sendVerificationEmail from "../lib/sendVerificationEmail";
+import sendVerificationEmail from "../../dal/lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
 

@@ -1,6 +1,6 @@
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import Bugsnag from "@bugsnag/js";
-import sendVerificationEmail from "../lib/sendVerificationEmail";
+import sendVerificationEmail from "../../dal/lib/sendVerificationEmail";
 import { verifiedEmailByEmail } from "../../dal/verifiedEmailByEmail";
 
 if (!process.env.WEB_APP_BASE_URL) {

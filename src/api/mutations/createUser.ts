@@ -7,7 +7,7 @@ import { ResolverContext } from "../lib/ResolverContext";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
-import sendVerificationEmail from "../lib/sendVerificationEmail";
+import sendVerificationEmail from "../../dal/lib/sendVerificationEmail";
 import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
 
 export const createUser: MutationResolvers["createUser"] = async (

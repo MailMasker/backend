@@ -47,9 +47,9 @@ module.exports = {
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
-    // new BugsnagSourceMapUploaderPlugin({
-    //   apiKey: "3e593a7f71377ef86cf65c7cda2570db",
-    //   overwrite: true,
-    // }),
+    new BugsnagSourceMapUploaderPlugin({
+      apiKey: "3e593a7f71377ef86cf65c7cda2570db",
+      overwrite: true,
+    }),
   ],
 };
