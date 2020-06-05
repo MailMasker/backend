@@ -26,7 +26,9 @@ export const createVerifiedEmail = async (
     throw new Error("Must be signed in");
   }
 
-  const { domain } = deconstructExternalEmail({ email: args.email });
+  const cleanedDesiredEmail = args.email.toLocaleLowerCase().trim();
+
+  const { domain } = deconstructExternalEmail({ email: cleanedDesiredEmail });
   if (
     SupportedMailDomains.includes(domain) ||
     domain.toLowerCase().includes("mailmasker") // Protect against dev environment being used as well
@@ -42,7 +44,7 @@ export const createVerifiedEmail = async (
   try {
     const existingVerifiedEmails = await verifiedEmailsByEmailForAllUsers(
       dalContext,
-      { email: args.email.trim() }
+      { email: cleanedDesiredEmail }
     );
     if (existingVerifiedEmails.length >= MaxNumAccountsSharingAVerifiedEmail) {
       verifiedEmailUsedTooManyTimes = true;
@@ -57,14 +59,14 @@ export const createVerifiedEmail = async (
   }
   if (verifiedEmailUsedTooManyTimes) {
     throw new UserInputError(
-      `the email address ${args.email.trim()} has already been verified on the maximum number of accounts`
+      `the email address ${cleanedDesiredEmail} has already been verified on the maximum number of accounts`
     );
   }
 
   let existingVerifiedEmail;
   try {
     existingVerifiedEmail = await verifiedEmailByEmail(dalContext, {
-      email: args.email.trim(),
+      email: cleanedDesiredEmail,
       ownerUserID: currentUserID,
     });
   } catch (err) {
@@ -87,7 +89,7 @@ export const createVerifiedEmail = async (
   }
 
   const response = await dal.createVerifiedEmail(dalContext, {
-    email: args.email,
+    email: cleanedDesiredEmail,
     userID: currentUserID,
   });
 

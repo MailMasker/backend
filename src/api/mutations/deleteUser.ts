@@ -52,7 +52,7 @@ export const deleteUser = async (
     | undefined;
   for (let i = 0; i < 3; i++) {
     try {
-      scrambledUsername = uuid();
+      scrambledUsername = uuid().toLowerCase();
       // A NotFoundError should be thrown, unless the user is already taken
       existingUserWithNewUsername = await userByUsername(dalContext, {
         username: scrambledUsername,

@@ -15,9 +15,13 @@ export const authenticate = async (
   { setAuthCookie, dalContext }: ResolverContext,
   info
 ) => {
+  const cleanedUsername = args.username.toLowerCase().trim();
+
   try {
-    console.debug("getting user for username: ", args.username);
-    const user = await userByUsername(dalContext, { username: args.username });
+    console.debug("getting user for username: ", cleanedUsername);
+    const user = await userByUsername(dalContext, {
+      username: cleanedUsername,
+    });
 
     if (user.deletedISO) {
       await updateUser(dalContext, user.id, {

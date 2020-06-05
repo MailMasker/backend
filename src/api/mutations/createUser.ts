@@ -4,6 +4,7 @@ import Bugsnag from "@bugsnag/js";
 import { MaxNumAccountsSharingAVerifiedEmail } from "../../dal/lib/constants";
 import { MutationResolvers } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
+import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
 import sendVerificationEmail from "../lib/sendVerificationEmail";
@@ -15,23 +16,36 @@ export const createUser: MutationResolvers["createUser"] = async (
   { setAuthCookie, dalContext, ses }: ResolverContext,
   info
 ) => {
-  const desiredUsername = args.username.trim();
+  const cleanedDesiredUsername = args.username.toLowerCase().trim();
+  const cleanedDesiredVerifiedEmail = args.verifiedEmail.toLowerCase().trim();
+  const cleanedDesiredEmailMask = args.emailMask.toLowerCase().trim();
   const desiredPassword = args.password.trim();
 
-  if (!desiredUsername) {
+  if (!cleanedDesiredUsername) {
     throw new UserInputError("username missing");
   }
-  if (await dal.isUsernameTaken(dalContext, { username: desiredUsername })) {
-    throw new UserInputError("User with username already exists");
+  if (
+    await dal.isUsernameTaken(dalContext, { username: cleanedDesiredUsername })
+  ) {
+    throw new UserInputError(
+      `User with username ${args.username} already exists`
+    );
   }
   if (!desiredPassword) {
-    throw new UserInputError("password missing");
+    throw new UserInputError("Please specify a password");
   }
 
-  const { alias } = deconstructMailMask({ email: args.emailMask });
+  const { alias, domain } = deconstructMailMask({
+    email: cleanedDesiredEmailMask,
+  });
+  if (!SupportedMailDomains.includes(domain)) {
+    throw new UserInputError(
+      "The domain of the Mail Mask you've chosen is unsupported"
+    );
+  }
   const emailMaskTaken = await dal.isEmailMaskTaken(dalContext, { alias });
   if (emailMaskTaken) {
-    throw new UserInputError("the Mail Mask you've chosen is already taken");
+    throw new UserInputError("The Mail Mask you've chosen is already taken");
   }
 
   // We do this primarily to prevent having to paginate or deal with performance issues when using the verifiedEmailsByEmailForAllUsers lookup once someone inevitably create many accounts
@@ -40,7 +54,7 @@ export const createUser: MutationResolvers["createUser"] = async (
   try {
     const existingVerifiedEmails = await verifiedEmailsByEmailForAllUsers(
       dalContext,
-      { email: args.verifiedEmail.trim() }
+      { email: cleanedDesiredVerifiedEmail }
     );
     if (existingVerifiedEmails.length >= MaxNumAccountsSharingAVerifiedEmail) {
       verifiedEmailUsedTooManyTimes = true;
@@ -55,7 +69,7 @@ export const createUser: MutationResolvers["createUser"] = async (
   }
   if (verifiedEmailUsedTooManyTimes) {
     throw new UserInputError(
-      `the email address ${args.verifiedEmail.trim()} has already been verified on the maximum number of accounts`
+      `the email address ${cleanedDesiredVerifiedEmail} has already been verified on the maximum number of accounts`
     );
   }
 
@@ -66,12 +80,12 @@ export const createUser: MutationResolvers["createUser"] = async (
     verifiedEmail,
     auth: { authToken, secondsUntilExpiry },
   } = await dal.createUser(dalContext, {
-    username: desiredUsername.trim(),
+    username: cleanedDesiredUsername,
     password: desiredPassword.trim(),
     requestUUID: args.uuid,
     persistent: args.persistent,
-    emailMask: args.emailMask.trim(),
-    verifiedEmail: args.verifiedEmail.trim(),
+    emailMask: cleanedDesiredEmailMask,
+    verifiedEmail: cleanedDesiredVerifiedEmail,
   });
 
   if (process.env.S_STAGE !== "local") {

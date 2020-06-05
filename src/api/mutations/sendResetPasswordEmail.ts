@@ -23,7 +23,9 @@ export const sendResetPasswordEmail = async (
   context: AuthenticatedResolverContext,
   info
 ) => {
-  if (!args.usernameOrEmail) {
+  const cleanedUsernameOrEmail = args.usernameOrEmail.toLowerCase().trim();
+
+  if (!cleanedUsernameOrEmail) {
     throw new Error("please provide your username or email");
   }
 
@@ -31,7 +33,7 @@ export const sendResetPasswordEmail = async (
   let userID: string | undefined;
   try {
     const user = await userByUsername(context.dalContext, {
-      username: args.usernameOrEmail,
+      username: cleanedUsernameOrEmail,
     });
     userID = user.id;
   } catch (err) {
@@ -39,7 +41,7 @@ export const sendResetPasswordEmail = async (
       try {
         const verifiedEmails = await verifiedEmailsByEmailForAllUsers(
           context.dalContext,
-          { email: args.usernameOrEmail }
+          { email: cleanedUsernameOrEmail }
         );
         if (verifiedEmails.length > 0) {
           console.error(
