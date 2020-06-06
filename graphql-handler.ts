@@ -1,4 +1,3 @@
-// @ts-ignore
 import { ApolloServer, AuthenticationError } from "apollo-server-express";
 import {
   AuthenticatedResolverContext,
@@ -7,6 +6,7 @@ import {
 import { MutationResolvers, QueryResolvers } from "./src/api/types.generated";
 
 import AWS from "aws-sdk";
+// @ts-ignore
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import { DALContext } from "./src/dal/DALContext";
@@ -144,7 +144,8 @@ const apollo = new ApolloServer({
       setAuthCookie: ({ authToken, secondsUntilExpiry }) => {
         res.cookie("jwt", authToken, {
           httpOnly: true,
-          ...(secondsUntilExpiry ? { maxAge: secondsUntilExpiry } : {}),
+          // maxAge units are milliseconds (for Express) but seconds for the browser – Express server does the converstion from milliseconds to seconds
+          ...(secondsUntilExpiry ? { maxAge: secondsUntilExpiry * 1000 } : {}),
           secure: true,
           domain: process.env.API_DOMAIN,
           sameSite: process.env.S_STAGE === "local" ? "none" : "strict",
