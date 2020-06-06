@@ -108,7 +108,7 @@ export const deleteUser = async (
         },
         {
           key: "__CTA_URL__",
-          value: `https://help.mailmasker.com`,
+          value: `https://app.mailmasker.com/help`,
         },
       ]
     );
