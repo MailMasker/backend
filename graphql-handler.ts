@@ -147,12 +147,16 @@ const apollo = new ApolloServer({
           // maxAge units are milliseconds (for Express) but seconds for the browser – Express server does the converstion from milliseconds to seconds
           ...(secondsUntilExpiry ? { maxAge: secondsUntilExpiry * 1000 } : {}),
           secure: true,
+          path: "/",
           domain: process.env.API_DOMAIN,
           sameSite: process.env.S_STAGE === "local" ? "none" : "strict",
         });
       },
       clearAuthCookie: () => {
-        res.clearCookie("jwt");
+        res.clearCookie("jwt", {
+          path: "/",
+          domain: process.env.API_DOMAIN,
+        });
       },
       authToken,
       ses: new AWS.SES({ apiVersion: "2010-12-01" }),
