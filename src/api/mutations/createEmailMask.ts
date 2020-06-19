@@ -1,11 +1,17 @@
 import * as dal from "../../dal/";
 
 import { AuthenticationError, UserInputError } from "apollo-server-core";
+import {
+  MaxNumEmailMasksForFreeUsers,
+  MaxNumEmailMasksForPaidUsers,
+} from "../../dal/lib/constants";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { EmailMask } from "../types.generated";
+import { PlanType } from "../../dal/lib/plans";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
+import { userByID } from "../../dal/userByID";
 
 const aliasRegex = /^[a-z0-9]+$/i;
 
@@ -20,6 +26,23 @@ export const createEmailMask = async (
   }
   if (!raw) {
     throw new UserInputError("Please specify an email address");
+  }
+
+  const user = await userByID(dalContext, currentUserID);
+  if (
+    user._planDetails.planType === PlanType.Free &&
+    user.emailMaskIDs.length >= MaxNumEmailMasksForFreeUsers
+  ) {
+    throw new UserInputError(
+      "Since you're on the Free plan, you can only claim up to 3 Mail Masks. Upgrade now to claim more Mail Masks."
+    );
+  } else if (
+    user._planDetails.planType !== PlanType.Free &&
+    user.emailMaskIDs.length >= MaxNumEmailMasksForPaidUsers
+  ) {
+    throw new UserInputError(
+      "You can only claim up to 100 Mail Masks. This limit has been put into place in order to protect the system from malintent. Please reach out to us at premium@mailmasker.com, explaining how you intend to use Mail Masker, to have this limit increased."
+    );
   }
 
   const { alias, domain, mailMaskParts, expiryToken } = deconstructMailMask({
