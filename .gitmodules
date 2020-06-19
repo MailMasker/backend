@@ -1,3 +1,6 @@
 [submodule "src/dal"]
 	path = src/dal
 	url = https://jonsibley@bitbucket.org/jonsibley/email-forwarder-dal.git
+[submodule "src/lib/common"]
+	path = src/lib/common
+	url = https://github.com/MailMasker/common.git

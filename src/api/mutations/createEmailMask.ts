@@ -10,7 +10,7 @@ import { AuthenticatedResolverContext } from "../lib/ResolverContext";
 import { EmailMask } from "../types.generated";
 import { PlanType } from "../../dal/lib/plans";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
-import { deconstructMailMask } from "../../dal/lib/deconstructMailMask";
+import { deconstructMailMask } from "../../lib/common/deconstructMailMask";
 import { userByID } from "../../dal/userByID";
 
 const aliasRegex = /^[a-z0-9]+$/i;
