@@ -4,6 +4,7 @@ import { AuthenticationError, UserInputError } from "apollo-server-core";
 import {
   MaxNumEmailMasksForFreeUsers,
   MaxNumEmailMasksForPaidUsers,
+  MinEmailMaskAliasLength,
 } from "../../dal/lib/constants";
 
 import { AuthenticatedResolverContext } from "../lib/ResolverContext";
@@ -50,8 +51,20 @@ export const createEmailMask = async (
   });
 
   if (!aliasRegex.test(alias)) {
+    if (alias.includes(".")) {
+      throw new UserInputError(
+        `We currently only support letters and numbers when creating Mail Masks in advance; however, you can always add things like ".whatever" to create a new secondary Mask on-the-fly, or add ".14d" to create a new Mask that auto-stops 14 days after receiving its first email.)`
+      );
+    } else {
+      throw new UserInputError(
+        `We currently only support letters and numbers in Mail Masks, as other characters are reserved for future functionality.")`
+      );
+    }
+  }
+
+  if (alias.length <= MinEmailMaskAliasLength) {
     throw new UserInputError(
-      `We currently only support letters and numbers in the alias of your Mail Mask, as other characters are reserved for future functionality.")`
+      `Mail Masks must be ${MinEmailMaskAliasLength} characters or longer.")`
     );
   }
 
