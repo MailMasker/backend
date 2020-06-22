@@ -22,3 +22,5 @@ deploy-prod.sh
 secrets-local.yml
 secrets-dev.yml
 secrets-prod.yml
+
+.env*

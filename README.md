@@ -23,7 +23,7 @@ and finally:
 yarn install
 ```
 
-## Run it locally
+## Run the GraphQL API locally
 
 Generate certificate and private key so that the localhost API can be on HTTPS:
 
@@ -52,6 +52,41 @@ Running GraphQL Playground to test the API:
 2. Set the URL text box inside the interface itself to `https://localhost:4201/local/graphql` – this is because the local API is at https://localhost:4201/local/graphql
 3. Open Settings in the GraphQL Playground interface and set `request.credentials` to `include`
 4. Set `schema.polling.enable` to `false` in order to make much less noise in your CloudWatch logs
+
+## Run the events API locally
+
+```
+brew install postgresql # I run postgresql 12.3 at the time of this writing
+
+# Init postgres
+initdb /usr/local/var/postgres
+
+# Start the server (needs to be done each time)
+pg_ctl -D /usr/local/var/postgres -l logfile start
+
+# Create a user
+createuser --pwprompt mailmasker
+
+# Create the DB
+createdb -Omailmasker -Eutf8 mailmasker
+
+# Connect via the CLI
+psql -U mailmasker -W mailmasker
+```
+
+Set up a .env file:
+
+Contents of ./src/local/event/.env-local
+
+```
+# Environment variables declared in this file are automatically made available to Prisma.
+# See the documentation for more detail: https://pris.ly/d/prisma-schema#using-environment-variables
+
+# Prisma supports the native connection string format for PostgreSQL, MySQL and SQLite.
+# See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+
+DATABASE_URL="postgresql://johndoe:randompassword@localhost:5432/mydb?schema=public"
+```
 
 ### Testing Stripe callbacks
 

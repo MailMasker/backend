@@ -1,0 +1,11 @@
+{
+	"resource": "/",
+	"path": "/event",
+	"httpMethod": "POST",
+	"headers": {
+		"Content-Type": "application/json"
+	},
+	"body": {
+		"name": "api.graphql-query"
+	}
+}

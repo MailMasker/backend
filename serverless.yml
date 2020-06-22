@@ -158,11 +158,11 @@ functions:
       DAL_ENVIRONMENT: email-forwarder
       BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
 
-  events:
-    handler: src/events-handler.handler
+  event:
+    handler: src/event/event-handler.handler
     events:
       - http:
-          path: events
+          path: event
           method: post
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
@@ -171,3 +171,4 @@ functions:
       DB_HOST: ${self:provider.stage}
       DB_USERNAME: ${self:provider.stage}
       DB_PASSWORD: ${self:provider.stage}
+      DOT_ENV_FILE: .env.${self:provider.stage}
