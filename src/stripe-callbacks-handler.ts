@@ -123,5 +123,5 @@ app.post(
 );
 
 const handler = serverless(app);
-"";
+
 export { handler };
