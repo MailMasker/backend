@@ -1,5 +1,6 @@
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
+import { Client } from "pg";
 import bodyParser from "body-parser";
 import { config } from "dotenv";
 import express from "express";
@@ -29,6 +30,22 @@ app.post(
   "/event",
   async (request: express.Request, response: express.Response) => {
     console.log("request to events-handler: ", request.body);
+
+    const client = new Client({
+      user: process.env.POSTGRES_DB_USERNAME,
+      host: process.env.POSTGRES_DB_HOST,
+      database: "mailmasker",
+      password: process.env.POSTGRES_DB_PASSWORD,
+      port: 5432,
+    });
+    client.connect();
+
+    await client
+      .query("SELECT NOW() as now")
+      .then((res) => console.log(res.rows[0]))
+      .catch((e) => console.error(e.stack));
+
+    console.log("ending");
 
     // Return a response to acknowledge receipt of the event
     response.json({ received: true });

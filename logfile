@@ -2,3 +2,9 @@
 2020-06-22 21:34:11.405 CEST [43477] HINT:  Is another postmaster (PID 43444) running in data directory "/usr/local/var/postgres"?
 2020-06-22 21:34:19.907 CEST [43504] FATAL:  lock file "postmaster.pid" already exists
 2020-06-22 21:34:19.907 CEST [43504] HINT:  Is another postmaster (PID 43444) running in data directory "/usr/local/var/postgres"?
+2020-06-23 18:42:42.879 CEST [19338] LOG:  starting PostgreSQL 12.3 on x86_64-apple-darwin19.4.0, compiled by Apple clang version 11.0.3 (clang-1103.0.32.59), 64-bit
+2020-06-23 18:42:42.881 CEST [19338] LOG:  listening on IPv6 address "::1", port 5432
+2020-06-23 18:42:42.881 CEST [19338] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2020-06-23 18:42:42.881 CEST [19338] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2020-06-23 18:42:42.890 CEST [19339] LOG:  database system was shut down at 2020-06-23 18:42:34 CEST
+2020-06-23 18:42:42.894 CEST [19338] LOG:  database system is ready to accept connections

@@ -40,7 +40,7 @@ module.exports = {
               cacheDirectory: path.resolve(".webpackCache"),
             },
           },
-          "babel-loader",
+          "ts-loader",
         ],
       },
     ],

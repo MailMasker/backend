@@ -86,6 +86,9 @@ custom:
     local: "mailmasker-local.com"
     dev: "mailmasker-dev.com"
     prod: "mailmasker.com"
+  POSTGRES_DB_HOST: ${file(./secrets-${self:provider.stage}.yml):postgres_db_host}
+  POSTGRES_DB_USERNAME: ${file(./secrets-${self:provider.stage}.yml):postgres_db_username}
+  POSTGRES_DB_PASSWORD: ${file(./secrets-${self:provider.stage}.yml):postgres_db_password}
   dynamodb:
     stages:
       - local
@@ -171,7 +174,6 @@ functions:
       JWT_SECRET: ${self:custom.JWT_SECRET}
       S_STAGE: ${self:provider.stage}
       BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
-      DB_HOST: ${self:provider.stage}
-      DB_USERNAME: ${self:provider.stage}
-      DB_PASSWORD: ${self:provider.stage}
-      DOT_ENV_FILE: .env.${self:provider.stage}
+      POSTGRES_DB_HOST: ${self:custom.POSTGRES_DB_HOST}
+      POSTGRES_DB_USERNAME: ${self:custom.POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${self:custom.POSTGRES_DB_PASSWORD}

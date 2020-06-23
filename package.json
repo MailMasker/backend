@@ -28,9 +28,11 @@
     "graphql-playground-middleware-express": "^1.7.12",
     "graphql-resolvers": "^0.3.3",
     "jsonwebtoken": "^8.5.1",
+    "pg": "^8.2.1",
     "raw-loader": "^4.0.1",
     "serverless-http": "^2.3.0",
     "stripe": "^8.55.0",
+    "ts-loader": "^7.0.5",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
@@ -61,7 +63,7 @@
     "serverless-plugin-typescript": "^1.1.9",
     "serverless-webpack": "^5.3.1",
     "ts-jest": "^25.4.0",
-    "typescript": "^3.7.2",
+    "typescript": "^3.9.5",
     "webpack": "^4.43.0",
     "webpack-bugsnag-plugins": "^1.4.3",
     "webpack-node-externals": "^1.7.2"
