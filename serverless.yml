@@ -17,6 +17,9 @@ provider:
       Action: "ses:SendEmail"
       Resource: "*"
     - Effect: "Allow"
+      Action: "rds:*"
+      Resource: ["arn:aws:rds:us-east-1:*:*"]
+    - Effect: "Allow"
       Action:
         - "s3:GetObject"
         - "s3:PutObject"

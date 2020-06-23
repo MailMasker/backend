@@ -8,7 +8,8 @@
     "deploy-dev": "./deploy-dev.sh",
     "gencerts": "mkcert localhost 127.0.0.1",
     "logs-graphql-dev": "aws-vault exec email-forwarder-dev -- awslogs get /aws/lambda/email-forwarder-api-dev-graphql --start='1 minute'",
-    "logs-stripe-callbacks-dev": "aws-vault exec email-forwarder-dev -- cw tail -f /aws/lambda/email-forwarder-api-dev-stripe --region=us-east-1"
+    "logs-stripe-callbacks-dev": "aws-vault exec email-forwarder-dev -- cw tail -f /aws/lambda/email-forwarder-api-dev-stripe --region=us-east-1",
+    "event-invoke": "serverless invoke local --function event --stage local --path local/event/sample-event.json"
   },
   "dependencies": {
     "@bugsnag/js": "^7.0.1",
@@ -36,7 +37,6 @@
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-typescript": "^7.3.3",
-    "@prisma/cli": "^2.0.1",
     "@graphql-codegen/cli": "^1.8.3",
     "@graphql-codegen/introspection": "1.8.3",
     "@graphql-codegen/typescript": "1.8.3",
