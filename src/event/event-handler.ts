@@ -40,10 +40,29 @@ app.post(
     });
     client.connect();
 
-    await client
-      .query("SELECT NOW() as now")
-      .then((res) => console.log(res.rows[0]))
-      .catch((e) => console.error(e.stack));
+    try {
+      const res = await client.query("SELECT NOW() as now");
+      console.log(res.rows[0]);
+    } catch (err) {
+      Bugsnag.notify(err);
+      console.error(err.stack);
+    }
+
+    try {
+      const text =
+        "INSERT INTO event(name, contentJSON, userID) VALUES($1, $2, $3)";
+      const values = [
+        "sample.event",
+        JSON.stringify({ hello: "world" }),
+        "user12345",
+      ];
+
+      const res = await client.query(text, values);
+      console.log(res.rows[0]);
+      // { name: 'brianc', email: 'brian.m.carlson@gmail.com' }
+    } catch (err) {
+      console.log(err.stack);
+    }
 
     console.log("ending");
 
