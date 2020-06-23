@@ -106,6 +106,7 @@ custom:
     securityPolicy: tls_1_2
 
 package:
+  individually: true
   include:
     - src/api/schema/schema.graphql
 
