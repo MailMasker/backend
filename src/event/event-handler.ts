@@ -3,6 +3,7 @@ import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import { Client } from "pg";
 import bodyParser from "body-parser";
 import { config } from "dotenv";
+import crypto from "crypto";
 import express from "express";
 import serverless from "serverless-http";
 
@@ -24,49 +25,47 @@ config({ path: process.env.DOT_ENV_FILE });
 
 const app = express();
 
-app.use(bodyParser.json({ type: "application/json" }));
-
 app.post(
   "/event",
+  bodyParser.json({ type: "application/json" }),
   async (request: express.Request, response: express.Response) => {
     console.log("request to events-handler: ", request.body);
+
+    if (!request.body.name) {
+      response.json({ received: false });
+      return;
+    } else if (!request.body.userIDHash) {
+      response.json({ received: false });
+      return;
+    }
 
     const client = new Client({
       user: process.env.POSTGRES_DB_USERNAME,
       host: process.env.POSTGRES_DB_HOST,
-      database: "mailmasker",
+      // For now, we expect username and db name to be equivalent
+      database: process.env.POSTGRES_DB_USERNAME,
       password: process.env.POSTGRES_DB_PASSWORD,
       port: 5432,
     });
     client.connect();
 
     try {
-      const res = await client.query("SELECT NOW() as now");
-      console.log(res.rows[0]);
-    } catch (err) {
-      Bugsnag.notify(err);
-      console.error(err.stack);
-    }
-
-    try {
-      const text =
-        "INSERT INTO event(name, contentJSON, userID) VALUES($1, $2, $3)";
+      const text = "INSERT INTO event(name, userIDHash) VALUES($1, $2, $3)";
       const values = [
-        "sample.event",
-        JSON.stringify({ hello: "world" }),
-        "user12345",
+        request.body.name,
+        crypto
+          .createHash("md5")
+          .update(request.body.userIDHash)
+          .digest("hex"),
       ];
-
-      const res = await client.query(text, values);
-      console.log(res.rows[0]);
-      // { name: 'brianc', email: 'brian.m.carlson@gmail.com' }
+      await client.query(text, values);
     } catch (err) {
       console.log(err.stack);
+      throw err;
     }
 
     console.log("ending");
 
-    // Return a response to acknowledge receipt of the event
     response.json({ received: true });
   }
 );
