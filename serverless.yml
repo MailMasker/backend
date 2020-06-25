@@ -26,6 +26,10 @@ provider:
       Resource: "arn:aws:s3:::email-forwarder-inbound-emails/*"
     - Effect: "Allow"
       Action:
+        - "SNS:Publish"
+      Resource: "arn:aws:sns:us-east-1:*:pending-event-topic"
+    - Effect: "Allow"
+      Action:
         - "dynamodb:DescribeTable"
         - "dynamodb:Query"
         - "dynamodb:Scan"
@@ -89,6 +93,10 @@ custom:
   POSTGRES_DB_HOST: ${file(./secrets-${self:provider.stage}.yml):postgres_db_host}
   POSTGRES_DB_USERNAME: ${file(./secrets-${self:provider.stage}.yml):postgres_db_username}
   POSTGRES_DB_PASSWORD: ${file(./secrets-${self:provider.stage}.yml):postgres_db_password}
+  PENDING_EVENTS_SNS_ARN:
+    local: ""
+    dev: "arn:aws:sns:us-east-1:747558615165:pending-event-topic"
+    prod: "arn:aws:sns:us-east-1:726929401065:pending-event-topic"
   dynamodb:
     stages:
       - local
@@ -178,3 +186,4 @@ functions:
       POSTGRES_DB_HOST: ${self:custom.POSTGRES_DB_HOST}
       POSTGRES_DB_USERNAME: ${self:custom.POSTGRES_DB_USERNAME}
       POSTGRES_DB_PASSWORD: ${self:custom.POSTGRES_DB_PASSWORD}
+      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN}
