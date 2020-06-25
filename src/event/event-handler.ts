@@ -4,9 +4,8 @@ import BugsnagPluginExpress from "@bugsnag/plugin-express";
 import bodyParser from "body-parser";
 import { config } from "dotenv";
 import express from "express";
+import queueEvent from "../dal/lib/queueEvent";
 import serverless from "serverless-http";
-
-const sns = new AWS.SNS({ region: "us-east-1" });
 
 Bugsnag.start({
   apiKey: "3e593a7f71377ef86cf65c7cda2570db",
@@ -24,10 +23,6 @@ if (!process.env.DOT_ENV_FILE) {
 }
 config({ path: process.env.DOT_ENV_FILE });
 
-if (!process.env.PENDING_EVENTS_SNS_ARN) {
-  Bugsnag.notify("process.env.PENDING_EVENTS_SNS_ARN missing");
-}
-
 const app = express();
 
 app.post(
@@ -39,31 +34,9 @@ app.post(
     if (!request.body.name) {
       response.json({ received: false });
       return;
-    } else if (!request.body.userIDHash) {
-      response.json({ received: false });
-      return;
     }
 
-    console.log(
-      `publishing event ${request.body.name} for user ${request.body.userIDHash}`
-    );
-
-    let params = {
-      Message: JSON.stringify({
-        name: request.body.name,
-        userIDHash: request.body.userIDHash,
-      }),
-      TopicArn: process.env.PENDING_EVENTS_SNS_ARN,
-    };
-
-    try {
-      await sns.publish(params).promise();
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-
-    console.log("ending");
+    await queueEvent(request.body.name, request.body.userID);
 
     response.json({ received: true });
   }
