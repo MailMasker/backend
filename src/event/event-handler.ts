@@ -36,7 +36,12 @@ app.post(
       return;
     }
 
-    await queueEvent(request.body.name, request.body.userID);
+    await queueEvent({
+      serviceName: request.body.serviceName,
+      type: request.body.type,
+      eventName: request.body.name,
+      userID: request.body.userID ?? undefined,
+    });
 
     response.json({ received: true });
   }

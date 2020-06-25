@@ -154,6 +154,7 @@ functions:
       MAIL_DOMAINS: ${self:custom.MAIL_DOMAINS.${self:provider.stage}}
       DAL_ENVIRONMENT: email-forwarder
       BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
+      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN.${self:provider.stage}}
 
   playground:
     handler: playground-handler.handler
@@ -179,6 +180,7 @@ functions:
       S_STAGE: ${self:provider.stage}
       DAL_ENVIRONMENT: email-forwarder
       BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
+      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN.${self:provider.stage}}
 
   event:
     handler: src/event/event-handler.handler
@@ -198,6 +200,8 @@ functions:
   processEvent:
     handler: src/process-event/process-event-handler.handler
     memorySize: 128
+    # We set to 1 in order to limit database connections that we open
+    provisionedConcurrency: 1
     events:
       - sqs:
           arn: arn:aws:sqs:us-east-1:${self:custom.AWS_ACCOUNT_ID.${self:provider.stage}}:pending-event-queue
