@@ -1,0 +1,2 @@
+ALTER TABLE event 
+ADD COLUMN uuid VARCHAR(200) CONSTRAINT unique_uuid_constraint UNIQUE

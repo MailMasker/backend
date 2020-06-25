@@ -90,6 +90,10 @@ custom:
     local: "mailmasker-local.com"
     dev: "mailmasker-dev.com"
     prod: "mailmasker.com"
+  AWS_ACCOUNT_ID:
+    local: ""
+    dev: "747558615165"
+    prod: "726929401065"
   POSTGRES_DB_HOST: ${file(./secrets-${self:provider.stage}.yml):postgres_db_host}
   POSTGRES_DB_USERNAME: ${file(./secrets-${self:provider.stage}.yml):postgres_db_username}
   POSTGRES_DB_PASSWORD: ${file(./secrets-${self:provider.stage}.yml):postgres_db_password}
@@ -121,6 +125,7 @@ package:
 functions:
   graphql:
     handler: graphql-handler.handler
+    memorySize: 128
     events:
       - http:
           path: graphql
@@ -152,13 +157,15 @@ functions:
 
   playground:
     handler: playground-handler.handler
+    memorySize: 128
     events:
       - http:
           path: playground
           method: get
 
   stripe:
-    handler: src/stripe-callbacks-handler.handler
+    handler: src/stripe-callbacks/stripe-callbacks-handler.handler
+    memorySize: 128
     events:
       - http:
           path: stripe-callbacks
@@ -175,10 +182,26 @@ functions:
 
   event:
     handler: src/event/event-handler.handler
+    memorySize: 128
     events:
       - http:
           path: event
           method: post
+    environment:
+      S_STAGE: ${self:provider.stage}
+      BUGSNAG_RELEASE_STAGE: ${self:provider.stage}
+      POSTGRES_DB_HOST: ${self:custom.POSTGRES_DB_HOST}
+      POSTGRES_DB_USERNAME: ${self:custom.POSTGRES_DB_USERNAME}
+      POSTGRES_DB_PASSWORD: ${self:custom.POSTGRES_DB_PASSWORD}
+      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN.${self:provider.stage}}
+
+  processEvent:
+    handler: src/process-event/process-event-handler.handler
+    memorySize: 128
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:${self:custom.AWS_ACCOUNT_ID.${self:provider.stage}}:pending-event-queue
+          batchSize: 1 # only process 1 email at a time (because otherwise, failure marks all of the queued items for retry, which makes it more likely we'll send the same email multiple times!)
     environment:
       JWT_SECRET: ${self:custom.JWT_SECRET}
       S_STAGE: ${self:provider.stage}

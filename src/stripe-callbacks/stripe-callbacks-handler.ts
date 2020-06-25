@@ -1,18 +1,17 @@
-import AWS from "aws-sdk";
 import Bugsnag from "@bugsnag/js";
 import BugsnagPluginExpress from "@bugsnag/plugin-express";
-import { DALContext } from "./dal";
+import { DALContext } from "../dal";
 import Stripe from "stripe";
 import bodyParser from "body-parser";
-import { createStripeSubscription } from "./dal/createStripeSubscription";
+import { createStripeSubscription } from "../dal/createStripeSubscription";
 import dayjs from "dayjs";
 import express from "express";
-import { markStripeSubscriptionDeleted } from "./dal/markStripeSubscriptionDeleted";
-import newDynamoDB from "./dal/lib/newDynamoDB";
+import { markStripeSubscriptionDeleted } from "../dal/markStripeSubscriptionDeleted";
+import newDynamoDB from "../dal/lib/newDynamoDB";
 import serverless from "serverless-http";
-import { stripeCheckoutSessionByID } from "./dal/stripeCheckoutSessionByID";
-import { stripeSubscriptionByID } from "./dal/stripeSubscriptionByID";
-import { userByID } from "./dal/userByID";
+import { stripeCheckoutSessionByID } from "../dal/stripeCheckoutSessionByID";
+import { stripeSubscriptionByID } from "../dal/stripeSubscriptionByID";
+import { userByID } from "../dal/userByID";
 
 const dalContext: DALContext = {
   ddb: newDynamoDB(),
