@@ -186,4 +186,4 @@ functions:
       POSTGRES_DB_HOST: ${self:custom.POSTGRES_DB_HOST}
       POSTGRES_DB_USERNAME: ${self:custom.POSTGRES_DB_USERNAME}
       POSTGRES_DB_PASSWORD: ${self:custom.POSTGRES_DB_PASSWORD}
-      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN}
+      PENDING_EVENTS_SNS_ARN: ${self:custom.PENDING_EVENTS_SNS_ARN.${self:provider.stage}}
