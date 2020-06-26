@@ -170,7 +170,9 @@ const app = express();
 // This must be the first piece of middleware in the stack.
 // It can only capture errors in downstream middleware
 const middleware = Bugsnag.getPlugin("express");
-app.use(middleware.requestHandler);
+if (middleware.requestHandler) {
+  app.use(middleware.requestHandler);
+}
 
 app.use(cookieParser());
 
@@ -192,7 +194,9 @@ apollo.applyMiddleware({
 });
 
 // This handles any errors that Express catches – it seems like it should be last?
-app.use(middleware.errorHandler);
+if (middleware.errorHandler) {
+  app.use(middleware.errorHandler);
+}
 
 const handler = serverless(app);
 

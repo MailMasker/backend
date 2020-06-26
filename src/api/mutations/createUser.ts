@@ -6,6 +6,7 @@ import { MutationResolvers } from "../types.generated";
 import { ResolverContext } from "../lib/ResolverContext";
 import SupportedMailDomains from "../../dal/lib/supportedMailDomains";
 import { UserInputError } from "apollo-server-core";
+import { deconstructExternalEmail } from "../../dal/lib/deconstructExternalEmail";
 import { deconstructMailMask } from "../../lib/common/deconstructMailMask";
 import sendVerificationEmail from "../../dal/lib/sendVerificationEmail";
 import { verifiedEmailsByEmailForAllUsers } from "../../dal/verifiedEmailsByEmailForAllUsers";
@@ -23,6 +24,15 @@ export const createUser: MutationResolvers["createUser"] = async (
 
   if (!cleanedDesiredUsername) {
     throw new UserInputError("username missing");
+  } else {
+    const { domain } = deconstructExternalEmail({
+      email: cleanedDesiredVerifiedEmail,
+    });
+    if (SupportedMailDomains.includes(domain)) {
+      throw new UserInputError(
+        `Your real email address must not be at the domain "${domain}"`
+      );
+    }
   }
   if (
     await dal.isUsernameTaken(dalContext, { username: cleanedDesiredUsername })
