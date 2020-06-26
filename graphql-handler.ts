@@ -170,7 +170,7 @@ const app = express();
 // This must be the first piece of middleware in the stack.
 // It can only capture errors in downstream middleware
 const middleware = Bugsnag.getPlugin("express");
-if (middleware.requestHandler) {
+if (middleware && middleware.requestHandler) {
   app.use(middleware.requestHandler);
 }
 
@@ -194,7 +194,7 @@ apollo.applyMiddleware({
 });
 
 // This handles any errors that Express catches – it seems like it should be last?
-if (middleware.errorHandler) {
+if (middleware && middleware.errorHandler) {
   app.use(middleware.errorHandler);
 }
 
