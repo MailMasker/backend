@@ -1,3 +1,15 @@
+# MailMasker Backend
+
+This is the Mail Masker backend, which includes:
+
+- an API for the web app (and future apps on other platforms)
+- the email hander: which forwards emails, putting them first on a queue to ensure no email is lost
+- a handler for Stripe callbacks (for Mail Masker Premium subscriptions)
+
+## License
+
+[No permission](https://choosealicense.com/no-permission/) is given for this repo to be used by others. Practically speaking, this code doesn't seem to be useful to anyone else; however, we believe that there is tremendous value in transparency of making it publically accessible.
+
 # Getting Started
 
 The following are quick notes, jotted-down in the moment as a basis for future documentation.
